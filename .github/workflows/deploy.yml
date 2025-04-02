@@ -19,19 +19,11 @@ jobs:
           toolchain: stable
 
       - name: Run tests with coverage
-        run: |
-          cargo install cargo-tarpaulin
-          cargo tarpaulin --out xml
+        run: cargo install cargo-tarpaulin
+          
           
       - name: Check test coverage
-        run: |
-          COVERAGE=$(grep 'line-rate="' coverage.xml | sed 's/.*line-rate="\([^"]*\)".*/\1/')
-          echo "Coverage: $COVERAGE"
-          if (( $(echo "$COVERAGE < 0.8" | bc -l) )); then
-            echo "Coverage too low!"
-            exit 1
-          fi
-        shell: bash
+        run: cargo tarpaulin --manifest-path backend/Cargo.toml --fail-under 80
 
       - name: Build release
         run: cargo build --release
