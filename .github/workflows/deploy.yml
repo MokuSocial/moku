@@ -1,0 +1,49 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test_and_build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Run tests with coverage
+        run: |
+          cargo install cargo-tarpaulin
+          cargo tarpaulin --out xml
+          
+      - name: Check test coverage
+        run: |
+          COVERAGE=$(grep 'line-rate="' coverage.xml | sed 's/.*line-rate="\([^"]*\)".*/\1/')
+          echo "Coverage: $COVERAGE"
+          if (( $(echo "$COVERAGE < 0.8" | bc -l) )); then
+            echo "Coverage too low!"
+            exit 1
+          fi
+        shell: bash
+
+      - name: Build release
+        run: cargo build --release
+
+      - name: Deploy via SSH
+        env:
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          JUMP_HOST: ${{ secrets.JUMP_HOST }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          scp -o ProxyJump=$SERVER_USER@$JUMP_HOST target/release/tuo_backend $SERVER_USER@$SERVER_HOST:/home/$SERVER_USER/tuo_backend
+          ssh -o ProxyJump=$SERVER_USER@$JUMP_HOST $SERVER_USER@$SERVER_HOST "sudo systemctl restart tuo_backend"
+
