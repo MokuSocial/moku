@@ -8,7 +8,7 @@ mod data_spot;
 #[tokio::main]
 async fn main() {
     // Inizializza il database
-    let setup = setup_db();
+    let setup = setup();
     // Configura il router con una route di test
     let app = Router::new()
         .route("/", get(|| async { "Hello, Axum!" }))
@@ -24,8 +24,6 @@ async fn main() {
     axum::serve(listener, app.into_make_service()).await.unwrap();
 }
 
-async fn setup_db() {
-    // Inizializza il database
-    let pool = data_spot::db::connect_db().await;
-    data_spot::db::initialize_db(&pool).await.unwrap();
+async fn setup() {
+    data_spot::setup().await;
 }

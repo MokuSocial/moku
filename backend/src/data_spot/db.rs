@@ -1,14 +1,33 @@
+use std::path::Path;
+use std::fs::File;
+
 use sqlx::{Pool, Sqlite, Error};
 use sqlx::sqlite::SqlitePoolOptions;
 use sqlx::sqlite::SqliteQueryResult;
 
 pub async fn connect_db() -> Pool<Sqlite> {
+    async fn try_connect() -> Result<Pool<Sqlite>, sqlx::Error> {
+        SqlitePoolOptions::new()
+            .max_connections(5)
+            .connect("sqlite://database.db")
+            .await
+    }
     // Crea una connessione al database SQLite
-    let pool = SqlitePoolOptions::new()
-        .max_connections(5)
-        .connect("sqlite://database.db")
+    let pool = try_connect()
         .await
-        .expect("Failed to connect to the database");
+        .unwrap_or_else( |_| {
+            // check if the database file exists and is accessible
+            let db_path = Path::new("database.db");
+            if db_path.exists() {
+                panic!("Database file exists but could not be opened. Check permissions.");
+            } else {
+                println!("Database file does not exist. Creating a new one.");
+                // Create the database File
+                File::create(db_path).expect("Failed to create database file");
+                panic!("Database file created restarting the connection");
+            }
+        });
+        //.expect("Failed to connect to the database\n Check if the database file exists and is accessible");
 
     pool
 
