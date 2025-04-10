@@ -25,6 +25,9 @@ jobs:
       - name: Check test coverage
         run: cargo tarpaulin --manifest-path backend/Cargo.toml --fail-under 80
 
+      - name: Prepare sqlx
+        run: cargo install sqlx-cli && cargo sqlx prepare --check
+
       - name: Build release
         run: cargo build --release
 
