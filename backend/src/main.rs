@@ -1,9 +1,21 @@
-use axum::{routing::get, Router};
+use axum::{routing::{get, post}, Router};
 use std::net::SocketAddr;
 use tokio;
 use tower_http::cors::{Any, CorsLayer};
 
+use async_graphql::{Schema, EmptyMutation, EmptySubscription};
+use async_graphql_axum::GraphQLRequest;
+use async_graphql_axum::GraphQLResponse;
+
 mod data_spot;
+mod graphql;
+
+
+// Handler per GraphQL
+async fn graphql_handler(req: GraphQLRequest) -> GraphQLResponse {
+    let schema = Schema::build(graphql::Query, EmptyMutation, EmptySubscription).finish();
+    schema.execute(req.into_inner()).await.into()
+}
 
 #[tokio::main]
 async fn main() {
@@ -11,6 +23,7 @@ async fn main() {
     let setup = setup();
     // Configura il router con una route di test
     let app = Router::new()
+        .route("/graphql", post(graphql_handler))
         .route("/", get(|| async { "Hello, Axum!" }))
         .layer(CorsLayer::new().allow_origin(Any));
 
