@@ -1,9 +1,18 @@
+use super::data_types::{Recipe, RecipeIngredient, Step};
 use std::path::Path;
 use std::fs::File;
 
 use sqlx::{Pool, Sqlite, Error, SqlitePool, query};
 use sqlx::sqlite::SqlitePoolOptions;
 use sqlx::sqlite::SqliteQueryResult;
+
+pub async fn setup() -> Result<(), String> {
+    // Inizializza il database
+    let pool = connect_db().await;
+    initialize_db(&pool).await.map_err(|e| format!("Failed to initialize database: {}", e))?;
+
+    Ok(())
+}
 
 pub async fn connect_db() -> Pool<Sqlite> {
     async fn try_connect() -> Result<Pool<Sqlite>, sqlx::Error> {
@@ -58,7 +67,7 @@ pub async fn initialize_db(pool: &Pool<Sqlite>) -> Result<SqliteQueryResult, Err
             identifier TEXT UNIQUE NOT NULL, 
             wikidata TEXT,
             cost_per_unit REAL,
-            unit TEXT CHECK (unit IN ('kg', 'g', 'l', 'ml', 'unit'))
+            unit TEXT CHECK (unit IN ('kg', 'g', 'l', 'ml', 'piece'))  -- Unità di misura
         );
 
         CREATE TABLE IF NOT EXISTS recipes (
@@ -75,17 +84,17 @@ pub async fn initialize_db(pool: &Pool<Sqlite>) -> Result<SqliteQueryResult, Err
             recipe_id INTEGER NOT NULL,
             ingredient_id INTEGER NOT NULL,
             quantity REAL NOT NULL,
-            unit TEXT NOT NULL,
+            unit TEXT CHECK (unit IN ('kg', 'g', 'l', 'ml', 'piece')) NOT NULL,
             FOREIGN KEY(recipe_id) REFERENCES recipes(id) ON DELETE CASCADE,
             FOREIGN KEY(ingredient_id) REFERENCES ingredients(id) ON DELETE CASCADE
         );
 
         CREATE TABLE IF NOT EXISTS recipe_steps (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
             recipe_id INTEGER NOT NULL,
             step_number INTEGER NOT NULL,
             description TEXT NOT NULL,
             image_url TEXT,
+            PRIMARY KEY(recipe_id, step_number),
             FOREIGN KEY(recipe_id) REFERENCES recipes(id) ON DELETE CASCADE
         );
 
@@ -109,35 +118,54 @@ pub async fn initialize_db(pool: &Pool<Sqlite>) -> Result<SqliteQueryResult, Err
 
 async fn create_recipe(
     db: &SqlitePool,
-    user_id: i32,
-    title: &str,
-    introduction: &str,
-    conclusion: &str
+    recipe : &Recipe,
 ) -> i64 {
     let rec_id = query!(
         "INSERT INTO recipes (user_id, title, introduction, conclusion) VALUES (?, ?, ?, ?) RETURNING id",
-        user_id, title, introduction, conclusion
+        recipe.user_id,recipe.title,recipe.introduction,recipe.conclusion
     )
     .fetch_one(db)
     .await
     .expect("Errore nell'inserimento della ricetta")
-    .id;
-
-    rec_id.unwrap_or_else(|| {
+    .id.unwrap_or_else(|| {
         panic!("Errore nell'inserimento della ricetta");
-    })
+    });
+
+    for ingredient in &recipe.ingredients {
+        add_ingredient_to_recipe(
+            db,
+            rec_id,
+            ingredient,
+        ).await;
+    }
+
+    for step in &recipe.steps {
+        add_recipe_step(
+            db,
+            rec_id,
+            step
+        ).await;
+    }
+
+    for tag in &recipe.tags {
+        add_tag_to_recipe(
+            db,
+            rec_id,
+            &tag.name
+        ).await.expect("Errore nell'aggiunta del tag alla ricetta");
+    }
+
+    rec_id
 }
 
 async fn add_ingredient_to_recipe(
     db: &SqlitePool,
-    recipe_id: i32,
-    ingredient_id: i32,
-    quantity: f64,
-    unit: &str
+    recipe_id: i64,
+    ingredient: &RecipeIngredient
 ) {
     query!(
         "INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit) VALUES (?, ?, ?, ?)",
-        recipe_id, ingredient_id, quantity, unit
+        recipe_id, ingredient.id, ingredient.quantity, ingredient.unit
     )
     .execute(db)
     .await
@@ -146,14 +174,12 @@ async fn add_ingredient_to_recipe(
 
 async fn add_recipe_step(
     db: &SqlitePool,
-    recipe_id: i32,
-    step_number: i32,
-    description: &str,
-    image_url: Option<&str>
+    recipe_id: i64,
+    step: &Step
 ) {
     query!(
         "INSERT INTO recipe_steps (recipe_id, step_number, description, image_url) VALUES (?, ?, ?, ?)",
-        recipe_id, step_number, description, image_url
+        recipe_id, step.step_number, step.description, step.image_url
     )
     .execute(db)
     .await

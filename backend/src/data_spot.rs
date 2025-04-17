@@ -1,9 +1,12 @@
 /* Data Single Point of Truth (SPOT) */
 
-mod db;
+pub mod db;
+pub mod data_types;
 
-pub async fn setup() {
+//use data_types::{Ingredient, Step, Recipe, Tag};
+
+pub async fn setup() -> Result<(), String> {
     // Inizializza il database
-    let pool = db::connect_db().await;
-    db::initialize_db(&pool).await.unwrap();
+    db::setup().await
+
 }

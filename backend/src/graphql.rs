@@ -1,13 +1,19 @@
 use async_graphql::{Context, Object};
+use crate::data_spot::data_types::Recipe;
 
 pub struct Query;
 
 #[Object]
 impl Query {
-    async fn hello(&self, ctx: &Context<'_>) -> String {
-        let word = "World".to_string();
-        let name = ctx.data_opt::<String>().unwrap_or(&word);
+    async fn hello(&self, name: String) -> String {
         format!("Hello, {}!", name)
     }
-}
 
+    async fn recipe(&self, ctx: &Context<'_>, id: i64) -> Option<Recipe> {
+        None
+    }
+
+    async fn recipes(&self, ctx: &Context<'_>, url: Option<String>, id: i64) -> Vec<Recipe> {
+        vec![]
+    }
+}
