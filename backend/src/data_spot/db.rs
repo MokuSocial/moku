@@ -1,171 +1,71 @@
-use super::data_types::{Recipe, RecipeIngredient, Step};
-use std::path::Path;
-use std::fs::File;
+// File: db.rs
 
-use sqlx::{Pool, Sqlite, Error, SqlitePool, query};
-use sqlx::sqlite::SqlitePoolOptions;
-use sqlx::sqlite::SqliteQueryResult;
+mod handler;
+mod users;
+mod ingredients;
+mod recipes;
+mod tags;
+mod recipe_ingredients;
+mod recipe_steps;
+mod recipe_tags;
+
+
+use super::data_types::{Recipe, RecipeIngredient, Step, UnitOfMeasure};
+
+use sqlx::{SqlitePool, query};
+
+//use tokio::task::JoinSet;
 
 pub async fn setup() -> Result<(), String> {
     // Inizializza il database
-    let pool = connect_db().await;
-    initialize_db(&pool).await.map_err(|e| format!("Failed to initialize database: {}", e))?;
+    let pool = handler::connect().await;
+    let handler = handler::initialize(&pool).await;
+    print!("Database initialized successfully");
+    handler.map_err(|e| format!("Failed to initialize database: {}", e))?;
+    println!("Database initialized successfully");
 
     Ok(())
 }
-
-pub async fn connect_db() -> Pool<Sqlite> {
-    async fn try_connect() -> Result<Pool<Sqlite>, sqlx::Error> {
-        SqlitePoolOptions::new()
-            .max_connections(5)
-            .connect("sqlite://database.db")
-            .await
-    }
-    // Crea una connessione al database SQLite
-    let pool_result = try_connect()
-        .await;
-
-    match pool_result {
-            Ok(pool) => {
-                println!("Connected to the database");
-                pool
-            }
-            Err(e) => {
-                println!("Failed to connect to the database: {}", e);
-                // check if the database file exists and is accessible
-                let db_path = Path::new("database.db");
-                if db_path.exists() {
-                    panic!("Database file exists but could not be opened. Check permissions.");
-                } else {
-                    println!("Database file does not exist. Creating a new one.");
-                    // Create the database File
-                    File::create(db_path).expect("Failed to create database file");
-                    // Retry the connection
-                    try_connect()
-                        .await
-                        .expect("Failed to connect to the database after creating the file")
-                }
-            }
-        }
-        
-    }
-
-
-pub async fn initialize_db(pool: &Pool<Sqlite>) -> Result<SqliteQueryResult, Error> {
-    sqlx::query(
-        r#"
-        CREATE TABLE IF NOT EXISTS users (
-            username TEXT PRIMARY KEY NOT NULL,  -- Identificatore dell'utente (stringa)
-            password_hash TEXT NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-
-        CREATE TABLE IF NOT EXISTS ingredients (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL UNIQUE,
-            identifier TEXT UNIQUE NOT NULL, 
-            wikidata TEXT,
-            cost_per_unit REAL,
-            unit TEXT CHECK (unit IN ('kg', 'g', 'l', 'ml', 'piece'))  -- Unità di misura
-        );
-
-        CREATE TABLE IF NOT EXISTS recipes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id TEXT NOT NULL,  -- Identificativo utente come stringa
-            title TEXT NOT NULL,
-            introduction TEXT NOT NULL,
-            conclusion TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY(user_id) REFERENCES users(username) ON DELETE CASCADE
-        );
-
-        CREATE TABLE IF NOT EXISTS recipe_ingredients (
-            recipe_id INTEGER NOT NULL,
-            ingredient_id INTEGER NOT NULL,
-            quantity REAL NOT NULL,
-            unit TEXT CHECK (unit IN ('kg', 'g', 'l', 'ml', 'piece')) NOT NULL,
-            FOREIGN KEY(recipe_id) REFERENCES recipes(id) ON DELETE CASCADE,
-            FOREIGN KEY(ingredient_id) REFERENCES ingredients(id) ON DELETE CASCADE
-        );
-
-        CREATE TABLE IF NOT EXISTS recipe_steps (
-            recipe_id INTEGER NOT NULL,
-            step_number INTEGER NOT NULL,
-            description TEXT NOT NULL,
-            image_url TEXT,
-            PRIMARY KEY(recipe_id, step_number),
-            FOREIGN KEY(recipe_id) REFERENCES recipes(id) ON DELETE CASCADE
-        );
-
-        CREATE TABLE IF NOT EXISTS tags (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL UNIQUE
-        );
-
-        CREATE TABLE IF NOT EXISTS recipe_tags (
-            recipe_id INTEGER NOT NULL,
-            tag_id INTEGER NOT NULL,
-            FOREIGN KEY(recipe_id) REFERENCES recipes(id) ON DELETE CASCADE,
-            FOREIGN KEY(tag_id) REFERENCES tags(id) ON DELETE CASCADE
-        );
-        "#
-    )
-    .execute(pool)
-    .await
-}
-
 
 async fn create_recipe(
     db: &SqlitePool,
     recipe : &Recipe,
 ) -> i64 {
-    let rec_id = query!(
-        "INSERT INTO recipes (user_id, title, introduction, conclusion) VALUES (?, ?, ?, ?) RETURNING id",
-        recipe.user_id,recipe.title,recipe.introduction,recipe.conclusion
-    )
-    .fetch_one(db)
-    .await
-    .expect("Errore nell'inserimento della ricetta")
-    .id.unwrap_or_else(|| {
-        panic!("Errore nell'inserimento della ricetta");
-    });
+    unimplemented!("Implementa la logica per creare una ricetta");
+    /*
+    let rec_id = recipes::add_recipe(db, recipe)
+    let ingredients_task : JoinSet<_> = recipe.ingredients.iter().map(|ingredient| {
+        add_ingredient_to_recipe(db, rec_id, ingredient)
+    }).collect();
 
-    for ingredient in &recipe.ingredients {
-        add_ingredient_to_recipe(
-            db,
-            rec_id,
-            ingredient,
-        ).await;
-    }
 
-    for step in &recipe.steps {
-        add_recipe_step(
-            db,
-            rec_id,
-            step
-        ).await;
-    }
+    let steps_task : JoinSet<_> = recipe.steps.iter().map(|step| {
+        add_recipe_step(db, rec_id, step)
+    }).collect();
 
-    for tag in &recipe.tags {
-        add_tag_to_recipe(
-            db,
-            rec_id,
-            &tag.name
-        ).await.expect("Errore nell'aggiunta del tag alla ricetta");
-    }
+    let tags_task : JoinSet<_> = recipe.tags.iter().map(|tag| {
+        add_tag_to_recipe(db, rec_id, &tag.name)
+    }).collect();
+
+
+    // Attendi il completamento di tutti i task
+    ingredients_task.join_all().await;
+    steps_task.join_all().await;
+    tags_task.join_all().await;
 
     rec_id
+    */
 }
-
+/*
 async fn add_ingredient_to_recipe(
     db: &SqlitePool,
     recipe_id: i64,
     ingredient: &RecipeIngredient
 ) {
+    let unit_str = ingredient.unit.map(|u| u.to_str().to_owned());
     query!(
         "INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit) VALUES (?, ?, ?, ?)",
-        recipe_id, ingredient.id, ingredient.quantity, ingredient.unit
+        recipe_id, ingredient.ingredient.id, ingredient.quantity, unit_str
     )
     .execute(db)
     .await
@@ -224,5 +124,4 @@ async fn add_tag_to_recipe(
     Ok(())
 }
 
-
-
+*/

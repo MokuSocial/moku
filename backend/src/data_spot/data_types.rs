@@ -90,3 +90,30 @@ impl Recipe {
         self.tags.clone()
     }
 }
+
+impl UnitOfMeasure {
+    pub fn from_str(unit: &str) -> Option<Self> {
+        match unit {
+            "g" => Some(UnitOfMeasure::Gram),
+            "kg" => Some(UnitOfMeasure::Kilogram),
+            "l" => Some(UnitOfMeasure::Liter),
+            "ml" => Some(UnitOfMeasure::Milliliter),
+            "piece" => Some(UnitOfMeasure::Piece),
+            _ => None,
+        }
+    }
+
+    pub fn to_str(&self) -> &str {
+        match self {
+            UnitOfMeasure::Gram => "g",
+            UnitOfMeasure::Kilogram => "kg",
+            UnitOfMeasure::Liter => "l",
+            UnitOfMeasure::Milliliter => "ml",
+            UnitOfMeasure::Piece => "piece",
+        }
+    }
+
+    pub fn to_string(&self) -> String {
+        self.to_str().to_string()
+    }
+}
