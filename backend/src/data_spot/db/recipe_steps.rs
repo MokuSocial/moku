@@ -80,18 +80,11 @@ pub async fn get_recipe_steps(
         recipe_id
     )
     .fetch_all(db)
-    .await;
+    .await?;
 
-    recipe_steps as  Result<Vec<RecipeStepDB>, sqlx::Error>
+    Ok(retipe_steps)
 
-    /*
-    recipe_steps.into_iter().map(|record| RecipeStepDB {
-        recipe_id: record.recipe_id,
-        step_number: record.step_number,
-        description: record.description,
-        image_url: record.image_url,
-    }).collect()
-    */
+
 }
 
 pub async fn update_recipe_step(

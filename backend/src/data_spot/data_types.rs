@@ -1,4 +1,5 @@
 use async_graphql::{SimpleObject, Enum, Object};
+use chrono::{DateTime, Utc};
 
 #[derive(SimpleObject, Clone)]
 pub struct Ingredient {
@@ -34,7 +35,7 @@ pub struct Recipe {
     pub introduction: String,
     pub steps: Vec<Step>,
     pub conclusion: String,
-    pub created_at: String,
+    pub created_at: DateTime<Utc>,
     pub tags: Vec<Tag>,
 }
 
@@ -83,7 +84,7 @@ impl Recipe {
     }
 
     async fn created_at(&self) -> String {
-        self.created_at.clone()
+        self.created_at.to_rfc3339()
     }
 
     async fn tags(&self) -> Vec<Tag> {

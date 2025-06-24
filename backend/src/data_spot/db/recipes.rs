@@ -1,7 +1,7 @@
 use sqlx::sqlite::SqliteQueryResult;
 
 #[derive(sqlx::FromRow)]
-struct RecipeDB {
+pub struct RecipeDB {
     id : i64,
     user_id : String,
     title : String,
@@ -47,7 +47,7 @@ pub async fn get_recipe(
     id: i64
 ) -> Result<Option<RecipeDB>, sqlx::Error> {
     let recipe = sqlx::query!(
-        "SELECT id, user_id, title, introduction, conclusion, created_at FROM recipes WHERE id = ?",
+        "SELECT id, user_id, title, introduction, conclusion, created_at, last_updated FROM recipes WHERE id = ?",
         id
     )
     .fetch_optional(db)
@@ -81,7 +81,7 @@ pub async fn get_recipes_by_user(
     user_id: &str
 ) -> Result<Vec<RecipeDB>, sqlx::Error> {
     let recipes = sqlx::query!(
-        "SELECT id, user_id, title, introduction, conclusion, created, last_updated FROM recipes WHERE user_id = ?",
+        "SELECT id, user_id, title, introduction, conclusion, created_at, last_updated FROM recipes WHERE user_id = ?",
         user_id
     )
     .fetch_all(db)
@@ -104,14 +104,17 @@ pub async fn update_recipe(
     new_introduction: Option<&str>,
     new_conclusion: Option<&str>
 ) -> Result<SqliteQueryResult, sqlx::Error> {
+    let new_title = new_title.map(|s| s.to_string());
+    let new_introduction = new_introduction.map(|s| s.to_string());
+    let new_conclusion = new_conclusion.map(|s| s.to_string());
     sqlx::query!(
         "UPDATE recipes SET title = ?, introduction = ?, conclusion = ? WHERE id = ?",
-        new_title.unwrap_or(""),
-        new_introduction.unwrap_or(""),
-        new_conclusion.unwrap_or(""),
+        new_title,
+        new_introduction,
+        new_conclusion,
         id
     )
     .execute(db)
-    .await?
+    .await
 }
 
