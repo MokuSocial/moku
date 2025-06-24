@@ -7,6 +7,8 @@ pub mod data_types;
 
 pub async fn setup() -> Result<(), String> {
     // Inizializza il database
-    db::setup().await
+    db::setup().await;
+
+    Ok(())
 
 }

@@ -11,10 +11,15 @@ use sqlx::sqlite::SqliteQueryResult;
 
 pub async fn connect() -> Pool<Sqlite> {
     async fn try_connect() -> Result<Pool<Sqlite>, sqlx::Error> {
-        SqlitePoolOptions::new()
+        let pool = SqlitePoolOptions::new()
             .max_connections(5)
             .connect("sqlite://database.db")
-            .await
+            .await;
+
+        pool.map(|pool| {
+            initialize(&pool);
+            pool
+        })
     }
     // Crea una connessione al database SQLite
     let pool_result = try_connect()
@@ -42,7 +47,6 @@ pub async fn connect() -> Pool<Sqlite> {
                 }
             }
         }
-        
 }
 
 
