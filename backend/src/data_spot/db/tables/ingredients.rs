@@ -1,7 +1,7 @@
 use sqlx::sqlite::SqliteQueryResult;
 
 #[derive(sqlx::FromRow)]
-struct IngredientDB {
+pub struct IngredientDB {
     id : i64,
     name : String,
     identifier : String,

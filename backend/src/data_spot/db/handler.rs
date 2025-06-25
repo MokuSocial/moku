@@ -14,12 +14,10 @@ pub async fn connect() -> Pool<Sqlite> {
         let pool = SqlitePoolOptions::new()
             .max_connections(5)
             .connect("sqlite://database.db")
-            .await;
+            .await?;
 
-        pool.map(|pool| {
-            initialize(&pool);
-            pool
-        })
+        initialize(&pool).await?;
+        Ok(pool)
     }
     // Crea una connessione al database SQLite
     let pool_result = try_connect()

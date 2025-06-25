@@ -1,7 +1,7 @@
 use sqlx::sqlite::SqliteQueryResult;
 
 
-struct RecipeTagDB {
+pub struct RecipeTagDB {
     recipe_id : i64,
     tag_id : i64,
 }

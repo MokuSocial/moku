@@ -17,14 +17,13 @@ pub async fn add_tag(
     db: &sqlx::SqlitePool,
     tag: &TagDB
 ) -> Result<i64, sqlx::Error> {
-    sqlx::query!(
-        "INSERT INTO tags (name) VALUES (?) RETURNING id",
-        tag.name
-    )
-    .fetch_one(db)
-    .await?
-    .id
-    .ok_or(sqlx::Error::RowNotFound)
+    Ok(sqlx::query!(
+            "INSERT INTO tags (name) VALUES (?) RETURNING id",
+            tag.name
+        )
+        .fetch_one(db)
+        .await?
+        .id)
 }
 
 pub async fn get_tag(

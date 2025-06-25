@@ -45,23 +45,23 @@ pub async fn add_recipe(
 pub async fn get_recipe(
     db: &sqlx::SqlitePool,
     id: i64
-) -> Result<Option<RecipeDB>, sqlx::Error> {
-    let recipe = sqlx::query!(
+) -> Result<RecipeDB, sqlx::Error> {
+    let record = sqlx::query!(
         "SELECT id, user_id, title, introduction, conclusion, created_at, last_updated FROM recipes WHERE id = ?",
         id
     )
     .fetch_optional(db)
-    .await?;
+    .await?.map_or(Err(sqlx::Error::RowNotFound), |record| Ok(record))?;
 
-    Ok(recipe.map(|record| RecipeDB {
-        id: record.id,
-        user_id: record.user_id,
-        title: record.title,
-        introduction: record.introduction,
-        conclusion: record.conclusion,
-        created_at: record.created_at,
-        last_updated: record.last_updated,
-    }))
+    Ok(RecipeDB {
+                    id: record.id,
+                    user_id: record.user_id,
+                    title: record.title,
+                    introduction: record.introduction,
+                    conclusion: record.conclusion,
+                    created_at: record.created_at,
+                    last_updated: record.last_updated,
+                })
 }
 pub async fn delete_recipe(
     db: &sqlx::SqlitePool,

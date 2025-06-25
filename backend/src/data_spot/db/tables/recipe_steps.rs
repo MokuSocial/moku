@@ -1,7 +1,7 @@
 use sqlx::sqlite::SqliteQueryResult;
 
 #[derive(sqlx::FromRow)]
-struct RecipeStepDB {
+pub struct RecipeStepDB {
     recipe_id : i64,
     step_number : i64,
     description : String,
@@ -80,9 +80,16 @@ pub async fn get_recipe_steps(
         recipe_id
     )
     .fetch_all(db)
-    .await?;
+    .await?
+    .into_iter()
+    .map(|record| RecipeStepDB {
+        recipe_id: record.recipe_id,
+        step_number: record.step_number,
+        description: record.description,
+        image_url: record.image_url,
+    }).collect();
 
-    Ok(retipe_steps)
+    Ok(recipe_steps)
 
 
 }
