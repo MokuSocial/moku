@@ -1,4 +1,8 @@
-use sqlx::sqlite::SqliteQueryResult;
+use sqlx::{sqlite::SqliteQueryResult, Pool, Sqlite};
+use crate::data_spot::{data_types::Recipe, db::{tables::{recipe_ingredients::{self, get_ingredients_by_recepie}, recipe_steps, recipe_tags, tags}, FromDB}};
+use super::recipe_ingredients::get_recipe_ingredients;
+use crate::data_spot::data_types::RecipeIngredient;
+
 
 #[derive(sqlx::FromRow)]
 pub struct RecipeDB {
@@ -24,6 +28,114 @@ impl RecipeDB {
         }
     }
 }
+
+impl From<&Recipe> for RecipeDB{
+    fn from(value: &Recipe) -> Self {
+        /*
+        Self {
+            id: value.id,
+            user_id: value.user_id,
+            title: value.title,
+            introduction: value.introduction,
+            conclusion: value.conclusion,
+            created_at: value.created_at.timestamp(),
+            last_updated: None, // This can be set later if needed
+        }*/
+        value.to_owned().into()
+    }
+    
+}
+
+impl From<Recipe> for RecipeDB {
+    fn from(recipe: Recipe) -> Self {
+        Self {
+            id: recipe.id,
+            user_id: recipe.user_id,
+            title: recipe.title,
+            introduction: recipe.introduction,
+            conclusion: recipe.conclusion,
+            created_at: recipe.created_at.timestamp(),
+            last_updated: None, // This can be set later if needed
+        }
+    }
+}
+
+impl FromDB<RecipeDB> for Recipe {
+    async fn from_db(db: &Pool<Sqlite>, recipe_db: RecipeDB) -> Result<Self, String> {
+        let recipe_ingredients = get_recipe_ingredients(db, recipe_db.id).await
+            .map_err(|e| e.to_string())?;
+        
+        let ingredients = recipe_ingredients.into_iter()
+            .map(|ri| ri.into())
+            .collect();
+
+        let steps = recipe_steps::get_recipe_steps(db, recipe_db.id)
+            .await
+            .map_err(|e| e.to_string())?
+            .into_iter()
+            .map(|step| step.into())
+            .collect();
+
+        let tags = recipe_tags::get_recipe_tags(db, recipe_db.id)
+            .await
+            .map_err(|e| e.to_string())?
+            .into_iter()
+            .filter_map(|tag| tags::get_tag(db, tag.tag_id).await.ok().flatten())
+            .map(|t| t.into())
+            .collect();
+
+        Ok(Self {
+            id: recipe_db.id,
+            user_id: recipe_db.user_id,
+            title: recipe_db.title,
+            ingredients,
+            introduction: recipe_db.introduction,
+            conclusion: recipe_db.conclusion,
+            created_at: chrono::DateTime::from_timestamp(recipe_db.created_at, 0)
+                .unwrap(), // Convert i64 to DateTime
+            steps,
+            tags,
+        })
+    }
+    
+}
+
+/*
+impl Recipe {
+    pub async fn try_from_db(db : &Pool<Sqlite>, recipe_db: RecipeDB) -> Result<Self, std::error::Error> {
+        let mut recipe_ingredients = vec![];
+        let ris = recipe_ingredients::get_recipe_ingredients(db, recipe_db.id).await?;
+        for ingredient in ris {
+            let recipe_ingredient = RecipeIngredient::from_db(db, ingredient).await?;
+            recipe_ingredients.push(recipe_ingredient);
+        }
+        
+        Ok(Self {
+                    id: recipe_db.id,
+                    user_id: recipe_db.user_id,
+                    title: recipe_db.title,
+                    ingredients: recipe_ingredients,
+                    introduction: recipe_db.introduction,
+                    conclusion: recipe_db.conclusion,
+                    created_at: chrono::DateTime::from_timestamp(recipe_db.created_at, 0)
+                        .unwrap(), // Convert i64 to DateTime
+                    steps: recipe_steps::get_recipe_steps(db, recipe_db.id)
+                        .await?
+                        .into_iter().map(|step| step.into()).collect(),
+                    tags: {
+                        let mut tags_v = vec![];
+                        recipe_tags::get_recipe_tags(db, recipe_db.id)
+                            .await?
+                            .into_iter()
+                            .for_each(|tag| tags::get_tag(db, tag.tag_id)
+                                .await?
+                                .map(|t| tags_v.push(t.into())))?;
+                        // TODO add autotag
+                        tags
+                    }
+                })
+    }
+}*/
 
 pub async fn add_recipe(
     db: &sqlx::SqlitePool,

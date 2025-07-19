@@ -4,7 +4,7 @@
 
 use std::path::Path;
 use std::fs::File;
-use sqlx::{query, query_file};
+use sqlx::{query_file};
 use sqlx::{Pool, Sqlite, Error};
 use sqlx::sqlite::SqlitePoolOptions;
 use sqlx::sqlite::SqliteQueryResult;
@@ -54,5 +54,6 @@ pub async fn initialize(pool: &Pool<Sqlite>) -> Result<SqliteQueryResult, Error>
     .execute(pool)
     .await
 }
+
 
 

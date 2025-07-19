@@ -1,4 +1,7 @@
 use sqlx::sqlite::SqliteQueryResult;
+use crate::data_spot::data_types::Ingredient;
+use crate::data_spot::data_types::UnitOfMeasure;
+use std::convert::TryFrom;
 
 #[derive(sqlx::FromRow)]
 pub struct IngredientDB {
@@ -21,6 +24,40 @@ impl IngredientDB {
             unit,
         }
     }
+}
+
+impl From<&Ingredient> for IngredientDB {
+    fn from(value: &Ingredient) -> Self {
+        value.to_owned().into()
+    }
+}
+
+impl From<Ingredient> for IngredientDB {
+    fn from(ingredient: Ingredient) -> Self {
+        Self {
+            id: ingredient.id,
+            name: ingredient.name,
+            identifier: ingredient.identifier,
+            wikidata: ingredient.wikidata,
+            cost_per_unit: ingredient.cost_per_unit,
+            unit: ingredient.unit.map(|u| u.to_string()),
+        }
+    }
+}
+
+impl TryFrom<IngredientDB> for Ingredient {
+    type Error = String;
+    fn try_from(ingredient_db: IngredientDB) -> Result<Self, Self::Error> {
+        Ok(Self {
+                    id: ingredient_db.id,
+                    name: ingredient_db.name,
+                    identifier: ingredient_db.identifier,
+                    wikidata: ingredient_db.wikidata,
+                    cost_per_unit: ingredient_db.cost_per_unit,
+                    unit: ingredient_db.unit.and_then(|u| UnitOfMeasure::from_str(&u)),
+                })
+    }
+    
 }
 
 pub async fn add_ingredient(

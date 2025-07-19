@@ -1,5 +1,10 @@
 use sqlx::sqlite::SqliteQueryResult;
 
+use super::ingredients::IngredientDB;
+use super::ingredients::get_ingredient;
+use crate::data_spot::data_types::RecipeIngredient;
+use crate::data_spot::data_types::UnitOfMeasure;
+
 
 #[derive(sqlx::FromRow)]
 pub struct RecipeIngredientDB {
@@ -19,6 +24,28 @@ impl RecipeIngredientDB {
         }
     }
 }
+
+impl From<RecipeIngredient> for IngredientDB {
+    fn from(value: RecipeIngredient) -> Self {
+        
+    }
+    
+}
+
+impl RecipeIngredient {
+    pub async fn from_db(db: &sqlx::SqlitePool, recipe_ingredient_db: RecipeIngredientDB) -> Result<Self, String> {
+        let ingredient = get_ingredient(db, recipe_ingredient_db.ingredient_id)
+            .await
+            .map_err(|e| format!("Failed to get ingredient: {}", e))?
+            .try_into()?;
+        Ok(Self {
+            ingredient,
+            quantity: recipe_ingredient_db.quantity,
+            unit: UnitOfMeasure::from_str(&recipe_ingredient_db.unit)
+        })
+    }
+}
+
 pub async fn add_recipe_ingredient(
     db: &sqlx::SqlitePool,
     recipe_ingredient: &RecipeIngredientDB
@@ -85,6 +112,27 @@ pub async fn get_recipe_ingredients(
         unit: record.unit,
     }).collect())
 }
+pub async fn get_ingredients_by_recepie(
+    db: &sqlx::SqlitePool,
+    recipe_id: i64
+) -> Result<Vec<IngredientDB>, sqlx::Error> {
+    let ingredients = sqlx::query!(
+        "SELECT I.id AS id, I.name AS name, I.identifier AS identifier, I.wikidata AS wikidata, I.cost_per_unit AS cost_per_unit, I.unit AS unit FROM recipe_ingredients AS RI, ingredients AS I WHERE recipe_id = ? AND I.id = RI.ingredient_id",
+        recipe_id
+    )
+    .fetch_all(db)
+    .await?;
+
+    Ok(ingredients.into_iter().map(|record| IngredientDB::new(
+             record.id,
+             record.name,
+             record.identifier,
+             record.wikidata,
+             record.cost_per_unit,
+             record.unit,
+        )).collect())
+}
+
 pub async fn update_recipe_ingredient(
     db: &sqlx::SqlitePool,
     recipe_id: i64,

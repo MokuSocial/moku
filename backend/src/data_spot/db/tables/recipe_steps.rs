@@ -1,4 +1,5 @@
 use sqlx::sqlite::SqliteQueryResult;
+use crate::data_spot::data_types::Step;
 
 #[derive(sqlx::FromRow)]
 pub struct RecipeStepDB {
@@ -15,6 +16,25 @@ impl RecipeStepDB {
             step_number,
             description,
             image_url,
+        }
+    }
+
+    pub fn from(step: Step, recipe_id: i64) -> Self {
+        Self {
+            recipe_id,
+            step_number: step.step_number as i64,
+            description: step.description,
+            image_url: step.image_url,
+        }
+    }
+}
+
+impl From<RecipeStepDB> for Step {
+    fn from(step_db: RecipeStepDB) -> Self {
+        Self {
+            step_number: step_db.step_number as i32,
+            description: step_db.description,
+            image_url: step_db.image_url,
         }
     }
 }

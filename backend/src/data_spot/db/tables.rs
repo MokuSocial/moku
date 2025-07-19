@@ -2,7 +2,7 @@
 pub mod recipes;
 // pub mod users;
 pub mod ingredients;
-//pub mod tags;
+pub mod tags;
 pub mod recipe_ingredients;
 pub mod recipe_steps;
 pub mod recipe_tags;
