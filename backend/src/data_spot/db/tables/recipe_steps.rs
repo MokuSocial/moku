@@ -39,6 +39,16 @@ impl From<RecipeStepDB> for Step {
     }
 }
 
+impl From<&RecipeStepDB> for Step {
+    fn from(step_db: &RecipeStepDB) -> Self {
+        Self {
+            step_number: step_db.step_number as i32,
+            description: step_db.description.clone(),
+            image_url: step_db.image_url.clone(),
+        }
+    }
+}
+
 pub async fn add_recipe_step(
     db: &sqlx::SqlitePool,
     recipe_step: &RecipeStepDB

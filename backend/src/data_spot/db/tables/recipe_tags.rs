@@ -10,6 +10,16 @@ impl RecipeTagDB {
         Self { recipe_id, tag_id }
     }
 }
+
+impl From<&RecipeTagDB> for RecipeTagDB {
+    fn from(recipe_tag: &RecipeTagDB) -> Self {
+        Self {
+            recipe_id: recipe_tag.recipe_id,
+            tag_id: recipe_tag.tag_id,
+        }
+    }
+}
+
 pub async fn add_recipe_tag(
     db: &sqlx::SqlitePool,
     recipe_tag: &RecipeTagDB

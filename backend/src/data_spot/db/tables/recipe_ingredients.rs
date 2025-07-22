@@ -14,6 +14,18 @@ pub struct RecipeIngredientDB {
     unit : String,
 }
 
+impl From<&RecipeIngredient> for RecipeIngredientDB {
+    fn from(ingredient: &RecipeIngredient) -> Self {
+        Self {
+            recipe_id: ingredient.recipe_id,
+            ingredient_id: ingredient.ingredient.id,
+            quantity: ingredient.quantity,
+            unit: ingredient.unit.to_string(),
+        }
+    }
+    
+}
+
 impl RecipeIngredientDB {
     pub fn new(recipe_id: i64, ingredient_id: i64, quantity: f64, unit: String) -> Self {
         Self {

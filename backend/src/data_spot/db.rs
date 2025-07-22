@@ -39,19 +39,11 @@ async fn create_recipe(
     }
 
     for step in &recipe.steps {
-        tables::recipe_steps::add_recipe_step(db, &tables::recipe_steps::RecipeStepDB::new(
-            rec_id,
-            step.step_number as i64,
-            step.description.clone(),
-            step.image_url.clone(),
-        )).await?;
+        tables::recipe_steps::add_recipe_step(db, &step.into()).await?;
     }
 
     for tag in &recipe.tags {
-        tables::recipe_tags::add_recipe_tag(db, &tables::recipe_tags::RecipeTagDB::new(
-            rec_id,
-            tag.id,
-        )).await?;
+        tables::recipe_tags::add_recipe_tag(db, &tag.into()).await?;
     }
 
     Ok(rec_id)

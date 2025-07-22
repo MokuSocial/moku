@@ -59,6 +59,7 @@ impl From<Recipe> for RecipeDB {
         }
     }
 }
+/*
 
 impl FromDB<RecipeDB> for Recipe {
     async fn from_db(db: &Pool<Sqlite>, recipe_db: RecipeDB) -> Result<Self, String> {
@@ -98,9 +99,25 @@ impl FromDB<RecipeDB> for Recipe {
         })
     }
     
-}
+}*/
 
 /*
+=======
+impl From<&Recipe> for RecipeDB {
+    fn from(recipe: &Recipe) -> Self {
+        Self {
+            id: recipe.id,
+            user_id: recipe.user_id.clone(),
+            title: recipe.title.clone(),
+            introduction: recipe.introduction.clone(),
+            conclusion: recipe.conclusion.clone(),
+            created_at: recipe.created_at.timestamp(),
+            last_updated: None, // This can be set later if needed
+        }
+    }   
+}
+
+>>>>>>> Stashed changes
 impl Recipe {
     pub async fn try_from_db(db : &Pool<Sqlite>, recipe_db: RecipeDB) -> Result<Self, std::error::Error> {
         let mut recipe_ingredients = vec![];
