@@ -38,5 +38,5 @@ async fn main() {
 }
 
 async fn setup() {
-    data_spot::setup().await;
+    data_spot::setup().await.unwrap();
 }
