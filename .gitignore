@@ -16,6 +16,5 @@ backend/*.pdb
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-backend/.env
-backend/.sqlx/
+.sqlx/
 database.db
