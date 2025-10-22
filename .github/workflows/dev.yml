@@ -35,7 +35,7 @@ jobs:
           # proxy_key: ${{ secrets.PROXY_KEY }}
           # proxy_port: ${{ secrets.PROXY_PORT }}
           source: target/release/moku
-          target: /usr/local/bin/moku
+          target: /usr/local/bin/
       - uses: appleboy/ssh-action@v1.1.0
         with:
           host: ${{ vars.HOST_DEV }}
