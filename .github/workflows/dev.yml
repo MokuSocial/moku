@@ -30,22 +30,16 @@ jobs:
           port: ${{ vars.PORT_DEV }}
           username: ${{ secrets.USER_DEV }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          # proxy_host: ${{ secrets.PROXY_HOST }}
-          # proxy_username: ${{ secrets.PROXY_USERNAME }}
-          # proxy_key: ${{ secrets.PROXY_KEY }}
-          # proxy_port: ${{ secrets.PROXY_PORT }}
           source: target/release/moku
           target: /usr/local/bin/
+          strip_components: 2
+          overwrite: true
       - uses: appleboy/ssh-action@v1.1.0
         with:
           host: ${{ vars.HOST_DEV }}
           port: ${{ vars.PORT_DEV }}
           username: ${{ secrets.USER_DEV }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          # proxy_host: ${{ secrets.PROXY_HOST }}
-          # proxy_username: ${{ secrets.PROXY_USERNAME }}
-          # proxy_key: ${{ secrets.PROXY_KEY }}
-          # proxy_port: ${{ secrets.PROXY_PORT }}
           script: |
             sudo systemctl restart moku
 
