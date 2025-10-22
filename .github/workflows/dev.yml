@@ -26,24 +26,26 @@ jobs:
       - run: cargo build --release
       - uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.HOST_DEV }}
+          host: ${{ vars.HOST_DEV }}
+          port: ${{ vars.PORT_DEV }}
           username: ${{ secrets.USER_DEV }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          proxy_host: ${{ secrets.PROXY_HOST }}
-          proxy_username: ${{ secrets.PROXY_USERNAME }}
-          proxy_key: ${{ secrets.PROXY_KEY }}
-          proxy_port: ${{ secrets.PROXY_PORT }}
+          # proxy_host: ${{ secrets.PROXY_HOST }}
+          # proxy_username: ${{ secrets.PROXY_USERNAME }}
+          # proxy_key: ${{ secrets.PROXY_KEY }}
+          # proxy_port: ${{ secrets.PROXY_PORT }}
           source: target/release/moku
           target: /usr/local/bin/moku
       - uses: appleboy/ssh-action@v1.1.0
         with:
-          host: ${{ secrets.HOST_DEV }}
+          host: ${{ vars.HOST_DEV }}
+          port: ${{ vars.PORT_DEV }}
           username: ${{ secrets.USER_DEV }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          proxy_host: ${{ secrets.PROXY_HOST }}
-          proxy_username: ${{ secrets.PROXY_USERNAME }}
-          proxy_key: ${{ secrets.PROXY_KEY }}
-          proxy_port: ${{ secrets.PROXY_PORT }}
+          # proxy_host: ${{ secrets.PROXY_HOST }}
+          # proxy_username: ${{ secrets.PROXY_USERNAME }}
+          # proxy_key: ${{ secrets.PROXY_KEY }}
+          # proxy_port: ${{ secrets.PROXY_PORT }}
           script: |
             sudo systemctl restart moku
 
