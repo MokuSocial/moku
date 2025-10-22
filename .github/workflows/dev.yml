@@ -24,6 +24,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo build --release
+      - uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ vars.HOST_DEV }}
+          port: ${{ vars.PORT_DEV }}
+          username: ${{ secrets.USER_DEV }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo systemctl stop moku
       - uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ vars.HOST_DEV }}
@@ -41,5 +49,5 @@ jobs:
           username: ${{ secrets.USER_DEV }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            sudo systemctl restart moku
+            sudo systemctl start moku
 
