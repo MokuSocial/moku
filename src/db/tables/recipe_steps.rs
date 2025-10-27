@@ -1,5 +1,5 @@
 use sqlx::sqlite::SqliteQueryResult;
-use crate::data_spot::data_types::Step;
+use crate::data_types::Step;
 
 #[derive(sqlx::FromRow)]
 pub struct RecipeStepDB {

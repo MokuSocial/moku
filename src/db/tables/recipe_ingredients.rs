@@ -2,8 +2,8 @@ use sqlx::sqlite::SqliteQueryResult;
 
 use super::ingredients::IngredientDB;
 use super::ingredients::get_ingredient;
-use crate::data_spot::data_types::RecipeIngredient;
-use crate::data_spot::data_types::UnitOfMeasure;
+use crate::data_types::RecipeIngredient;
+use crate::data_types::UnitOfMeasure;
 
 
 #[derive(sqlx::FromRow)]

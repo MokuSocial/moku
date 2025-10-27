@@ -1,7 +1,7 @@
 use sqlx::{sqlite::SqliteQueryResult, Pool, Sqlite};
-use crate::data_spot::{data_types::Recipe, db::{tables::{recipe_ingredients::{self, get_ingredients_by_recepie}, recipe_steps, recipe_tags, tags}, FromDB}};
+use crate::data_types::{Recipe, db::{tables::{recipe_ingredients::{self, get_ingredients_by_recepie}, recipe_steps, recipe_tags, tags}, FromDB}};
 use super::recipe_ingredients::get_recipe_ingredients;
-use crate::data_spot::data_types::RecipeIngredient;
+use crate::data_types::RecipeIngredient;
 
 
 #[derive(sqlx::FromRow)]

@@ -1,6 +1,6 @@
 use sqlx::sqlite::SqliteQueryResult;
-use crate::data_spot::data_types::Ingredient;
-use crate::data_spot::data_types::UnitOfMeasure;
+use crate::data_types::Ingredient;
+use crate::data_types::UnitOfMeasure;
 use std::convert::TryFrom;
 
 #[derive(sqlx::FromRow)]

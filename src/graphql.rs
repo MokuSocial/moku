@@ -1,14 +1,14 @@
 use async_graphql::{Context, Object, SimpleObject};
-use crate::data_spot::data_types::Recipe;
+use crate::data_types::Recipe;
 
 /*
 
 */
 #[derive(SimpleObject)]
 pub struct QueryRecipeResult {
-    pub page: i32,
+    //pub page: i32,
     pub results: Vec<Recipe>,
-    pub total_pages: i32,
+    //pub total_pages: i32,
     pub total_results: i32,
 }
 
@@ -24,12 +24,13 @@ impl Query {
         None
     }
 
-    async fn recipes(&self, ctx: &Context<'_>, url: Option<String>, id: Option<i64>) -> QueryRecipeResult {
+    async fn recipes(&self, ctx: &Context<'_>) -> QueryRecipeResult {
       QueryRecipeResult {
-        page: 1,
+        //page: 1,
         results: vec![],
-        total_pages: 1,
+        //total_pages: 1,
         total_results: 0,
       }
+
     }
 }

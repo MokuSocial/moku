@@ -7,8 +7,9 @@ use async_graphql::{Schema, EmptyMutation, EmptySubscription};
 use async_graphql_axum::GraphQLRequest;
 use async_graphql_axum::GraphQLResponse;
 
-mod data_spot;
+//mod data_spot;
 mod graphql;
+mod db;
 
 
 // Handler per GraphQL
@@ -38,5 +39,5 @@ async fn main() {
 }
 
 async fn setup() {
-    data_spot::setup().await.unwrap();
+    db::init_db().await;
 }

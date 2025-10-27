@@ -3,8 +3,7 @@
 mod handler;
 mod tables;
 
-use super::data_types::Recipe;
-use super::data_types::Ingredient;
+use crate::data_types::{Recipe, Ingredient};
 
 use sqlx::{Pool, Sqlite, SqlitePool};
 
@@ -56,18 +55,6 @@ async fn get_recipe(
     let rec = tables::recipes::get_recipe(db, id).await?;
 
     tables::recipes::RecipeDB::new(id, user_id, title, introduction, conclusion, created_at)
-
-    Ok(Recipe {
-        id: rec.id,
-        user_id: rec.user_id,
-        title: rec.title,
-        introduction: rec.introduction,
-        conclusion: rec.conclusion,
-        created_at: chrono::DateTime::from_timestamp(rec.created_at, 0).unwrap_or(chrono::Utc::now()), //TODO print error if timestamp is invalid
-        ingredients: vec![], // Placeholder, should be filled with actual ingredients
-        steps: vec![], // Placeholder, should be filled with actual steps
-        tags: vec![], // Placeholder, should be filled with actual tags
-    })
 }
 
 
