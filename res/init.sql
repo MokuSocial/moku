@@ -21,10 +21,13 @@ CREATE TABLE IF NOT EXISTS recipes (
 	author TEXT NOT NULL,  -- Identificativo utente come stringa
 	title TEXT NOT NULL,
 	banner_image_url TEXT,
+	servings INTEGER NOT NULL,
 	-- introduction TEXT NOT NULL,
 	-- conclusion TEXT NOT NULL,
-	created_at INTEGER NOT NULL,
+	created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
 	last_updated INTEGER DEFAULT NULL,
+	vote_count INTEGER NOT NULL DEFAULT 0,
+	vote_average REAL NOT NULL DEFAULT 0,
 	FOREIGN KEY(author) REFERENCES users(username) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -44,7 +47,7 @@ CREATE TABLE IF NOT EXISTS users (
 	created_at INTEGER NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS tag (
+CREATE TABLE IF NOT EXISTS tags (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	text TEXT NOT NULL UNIQUE
 );
