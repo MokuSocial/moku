@@ -13,8 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - name: Setup SQLite environment
-        uses: ccorsi/setup-sqlite@v1.2.1
+      - name: Setup SQLite
+        uses: ryohidaka/action-setup-sqlite@v1.2.0
       - run: touch database.db
       - run: sqlite3 database.db ".read res/init.sql"
       - run: cargo test --verbose
