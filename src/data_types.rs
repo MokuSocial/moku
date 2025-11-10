@@ -1,23 +1,6 @@
-use async_graphql::{SimpleObject, Enum, Object};
+use async_graphql::{ComplexObject, Enum, Object, SimpleObject};
 //use chrono::{DateTime, Utc};
-/*
-export interface Indication {
-  label: string;
-  value: string;
-}
 
-export interface RecipeStep {
-  text: string;
-  imageUrl?: string;
-}
-*/
-/*
-export interface Ingredient {
-  name: string;
-  quantity: number;
-  unit: string;
-}
-*/
 #[derive(SimpleObject, Clone)]
 pub struct Ingredient {
     id: i64,
@@ -45,44 +28,19 @@ pub enum UnitOfMeasure {
 }
 
 #[derive(SimpleObject, Clone)]
-pub struct Author {
-    pub id: String,
-    pub name: String,
-    pub avatar_url: String,
-}
-
-/*
-export interface Recipe {
-  id: string;
-  title: string;
-  bannerUrl: string;
-  servings: number;
-  ingredients: Ingredient[];
-  indications: Indication[];
-  steps: RecipeStep[];
-  author: {
-    id: string;
-    name: string;
-    avatarUrl: string;
-  };
-  vote_average: number;
-}
-*/
+#[graphql(complex)]
 pub struct Recipe {
     pub id: i64,
     pub author: Author,
     pub title: String,
     pub banner_url: Option<String>,
-    pub servings: i32,
-    pub ingredients: Vec<RecipeIngredient>,
-    pub indications: Indication,
+    pub servings: u16,
     //pub introduction: String,
-    pub steps: Vec<Step>,
     //pub conclusion: String,
     //pub created_at: DateTime<Utc>,
     //pub tags: Vec<Tag>,
     pub vote_average: f64,
-    pub votes: i32,
+    pub votes: u32,
 }
 
 #[derive(SimpleObject, Clone)]
@@ -90,6 +48,12 @@ pub struct Step {
     pub step_number: i32,
     pub description: String,
     pub image_url: Option<String>,
+}
+
+#[derive(SimpleObject, Clone)]
+#[graphql(complex)]
+pub struct Author {
+    pub username: String,
 }
 
 #[derive(SimpleObject, Clone)]
@@ -105,34 +69,18 @@ pub struct Indication {
     pub value: String,
 }
 
-#[Object]
+#[ComplexObject]
 impl Recipe {
-    async fn id(&self) -> i64 {
-        self.id
-    }
-
-    async fn author(&self) -> Author {
-        self.author.clone()
-    }
-
-    async fn title(&self) -> String {
-        self.title.clone()
-    }
-
-    async fn banner_url(&self) -> Option<String> {
-        self.banner_url.clone()
-    }
-
-    async fn servings(&self) -> i32 {
-        self.servings
-    }
 
     async fn ingredients(&self) -> Vec<RecipeIngredient> {
-        self.ingredients.clone()
+        vec![] // Placeholder implementation
     }
 
     async fn indications(&self) -> Indication {
-        self.indications.clone()
+        Indication { // Placeholder implementation
+            label: "Unimplemented".to_string(),
+            value: "Pleas wait our slow devs".to_string(),
+        }
     }
 
     // async fn introduction(&self) -> String {
@@ -140,7 +88,7 @@ impl Recipe {
     // }
 
     async fn steps(&self) -> Vec<Step> {
-        self.steps.clone()
+        vec![] // Placeholder implementation
     }
 
     // async fn conclusion(&self) -> String {
@@ -154,13 +102,15 @@ impl Recipe {
     // async fn tags(&self) -> Vec<Tag> {
     //     self.tags.clone()
     // }
+}
 
-    async fn vote_average(&self) -> f64 {
-        self.vote_average
+#[ComplexObject]
+impl Author {
+    async fn name(&self) -> String {
+        self.username.clone()
     }
-
-    async fn votes(&self) -> i32 {
-        self.votes
+    async fn avatar_url(&self) -> String {
+        "https://picsum.photos/256".to_string()
     }
 }
 

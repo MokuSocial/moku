@@ -3,7 +3,7 @@
 mod handler;
 mod tables;
 
-use crate::data_types::{Recipe, Ingredient};
+use crate::data_types::{Author, Ingredient, Recipe};
 
 use sqlx::{Pool, Sqlite, SqlitePool};
 
@@ -26,6 +26,24 @@ pub trait FromDB<T> {
     
 }
 
+pub async fn get_recipe(db: &SqlitePool, id: i64) -> Result<Recipe, String> {
+    let rec_db = tables::recipes::get_recipe(db, id).await.map_err(|e| e.to_string())?;
+    let author = Author {
+        username: rec_db.author.clone(),
+    };
+
+    Ok(Recipe {
+        id: rec_db.id,
+        author,
+        title: rec_db.title,
+        banner_url: rec_db.banner_url,
+        votes: rec_db.vote_count,
+        vote_average: rec_db.vote_average,
+        servings: rec_db.servings,
+    })
+}
+
+/*
 
 async fn create_recipe(
     db: &SqlitePool,
@@ -46,21 +64,22 @@ async fn create_recipe(
     }
 
     Ok(rec_id)
-}
-
+}*/
+/*
 async fn get_recipe(
     db: &SqlitePool,
     id: i64
 ) -> Result<Recipe, sqlx::Error> {
     let rec = tables::recipes::get_recipe(db, id).await?;
 
-    tables::recipes::RecipeDB::new(id, user_id, title, introduction, conclusion, created_at)
-}
+    tables::recipes::RecipeDB::new(id, user_id, title, introduction, conclusion, created_at).await;
+}*/
 
+/*
 
 async fn create_ingredient(
     db: &SqlitePool,
     ingredient: &Ingredient
 ) -> Result<i64, sqlx::Error> {
     tables::ingredients::add_ingredient(db, ingredient).await
-}
+}*/

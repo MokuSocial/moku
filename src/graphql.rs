@@ -1,5 +1,5 @@
 use async_graphql::{Context, Object, SimpleObject};
-use crate::data_types::Recipe;
+use crate::{data_types::Recipe, db};
 
 /*
 
@@ -21,7 +21,7 @@ impl Query {
     }
 
     async fn recipe(&self, ctx: &Context<'_>, id: i64) -> Option<Recipe> {
-        None
+      db::get_recipe(&ctx.data_unchecked::<sqlx::SqlitePool>(), id).await.ok()
     }
 
     async fn recipes(&self, ctx: &Context<'_>) -> QueryRecipeResult {

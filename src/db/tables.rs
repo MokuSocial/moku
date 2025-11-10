@@ -1,11 +1,12 @@
 /* DB tables */
 pub mod recipes;
-// pub mod users;
-pub mod ingredients;
-pub mod tags;
-pub mod recipe_ingredients;
-pub mod recipe_steps;
-pub mod recipe_tags;
+//// pub mod users;
+//pub mod ingredients;
+//pub mod tags;
+//pub mod recipe_ingredients;
+//pub mod recipe_steps;
+//pub mod recipe_tags;
+
 // pub mod recipe_images;
 // pub mod recipe_comments;
 // pub mod recipe_ratings;

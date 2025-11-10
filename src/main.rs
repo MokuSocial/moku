@@ -10,11 +10,14 @@ use async_graphql_axum::GraphQLResponse;
 //mod data_spot;
 mod graphql;
 mod db;
+mod data_types;
 
 
 // Handler per GraphQL
 async fn graphql_handler(req: GraphQLRequest) -> GraphQLResponse {
-    let schema = Schema::build(graphql::Query, EmptyMutation, EmptySubscription).finish();
+    let schema = Schema::build(graphql::Query, EmptyMutation, EmptySubscription)
+        .data(db::setup().await.expect("Failed to set up database"))
+        .finish();
     schema.execute(req.into_inner()).await.into()
 }
 
@@ -22,6 +25,7 @@ async fn graphql_handler(req: GraphQLRequest) -> GraphQLResponse {
 async fn main() {
     // Inizializza il database
     let setup = setup();
+    //let pool = db::setup().await.expect("Failed to set up database");
     // Configura il router con una route di test
     let app = Router::new()
         .route("/graphql", post(graphql_handler))
@@ -39,5 +43,4 @@ async fn main() {
 }
 
 async fn setup() {
-    db::init_db().await;
 }
