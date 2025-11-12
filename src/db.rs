@@ -3,7 +3,7 @@
 mod handler;
 mod tables;
 
-use crate::data_types::{Author, Ingredient, Recipe};
+use crate::data_types::{Author, Ingredient, Recipe, Step};
 
 use sqlx::{Pool, Sqlite, SqlitePool};
 
@@ -27,59 +27,13 @@ pub trait FromDB<T> {
 }
 
 pub async fn get_recipe(db: &SqlitePool, id: i64) -> Result<Recipe, String> {
-    let rec_db = tables::recipes::get_recipe(db, id).await.map_err(|e| e.to_string())?;
-    let author = Author {
-        username: rec_db.author.clone(),
-    };
+    let rec_db = tables::recipes::RecipeDB::get(db, id).await.map_err(|e| e.to_string())?;
 
-    Ok(Recipe {
-        id: rec_db.id,
-        author,
-        title: rec_db.title,
-        banner_url: rec_db.banner_url,
-        votes: rec_db.vote_count,
-        vote_average: rec_db.vote_average,
-        servings: rec_db.servings,
-    })
+    Ok(Recipe::from(rec_db))
 }
 
-/*
-
-async fn create_recipe(
-    db: &SqlitePool,
-    recipe : &Recipe,
-) -> Result<i64, sqlx::Error> {
-    let rec_id = tables::recipes::add_recipe(db, &recipe.into()).await?;
-
-    for ingredient in &recipe.ingredients {
-        tables::recipe_ingredients::add_recipe_ingredient(db, &ingredient.into()).await?;
-    }
-
-    for step in &recipe.steps {
-        tables::recipe_steps::add_recipe_step(db, &step.into()).await?;
-    }
-
-    for tag in &recipe.tags {
-        tables::recipe_tags::add_recipe_tag(db, &tag.into()).await?;
-    }
-
-    Ok(rec_id)
-}*/
-/*
-async fn get_recipe(
-    db: &SqlitePool,
-    id: i64
-) -> Result<Recipe, sqlx::Error> {
-    let rec = tables::recipes::get_recipe(db, id).await?;
-
-    tables::recipes::RecipeDB::new(id, user_id, title, introduction, conclusion, created_at).await;
-}*/
-
-/*
-
-async fn create_ingredient(
-    db: &SqlitePool,
-    ingredient: &Ingredient
-) -> Result<i64, sqlx::Error> {
-    tables::ingredients::add_ingredient(db, ingredient).await
-}*/
+pub async fn get_steps(db: &SqlitePool, recipe_id: i64) -> Result<Vec<Step>, String> {
+    let steps_db = tables::recipe_steps::RecipeStepDB::gets(db, recipe_id).await.map_err(|e| e.to_string())?;
+    let steps: Vec<Step> = steps_db.into_iter().map(|s| Step::from(s)).collect();
+    Ok(steps)
+}
