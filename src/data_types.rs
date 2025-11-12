@@ -1,4 +1,6 @@
-use async_graphql::{ComplexObject, Enum, Object, SimpleObject};
+use async_graphql::{ComplexObject, Enum, Context, SimpleObject};
+
+use crate::db::get_steps;
 //use chrono::{DateTime, Utc};
 
 #[derive(SimpleObject, Clone)]
@@ -45,7 +47,7 @@ pub struct Recipe {
 
 #[derive(SimpleObject, Clone)]
 pub struct Step {
-    pub step_number: i32,
+    pub step_number: u32,
     pub description: String,
     pub image_url: Option<String>,
 }
@@ -83,25 +85,10 @@ impl Recipe {
         }
     }
 
-    // async fn introduction(&self) -> String {
-    //     self.introduction.clone()
-    // }
-
-    async fn steps(&self) -> Vec<Step> {
-        vec![] // Placeholder implementation
+    async fn steps(&self, ctx: &Context<'_>) -> Vec<Step> {
+        get_steps(&ctx.data_unchecked::<sqlx::SqlitePool>(), self.id).await.unwrap_or_default()
     }
 
-    // async fn conclusion(&self) -> String {
-    //     self.conclusion.clone()
-    // }
-
-    // async fn created_at(&self) -> String {
-    //     self.created_at.to_rfc3339()
-    // }
-
-    // async fn tags(&self) -> Vec<Tag> {
-    //     self.tags.clone()
-    // }
 }
 
 #[ComplexObject]

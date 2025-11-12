@@ -4,7 +4,7 @@ pub mod recipes;
 //pub mod ingredients;
 //pub mod tags;
 //pub mod recipe_ingredients;
-//pub mod recipe_steps;
+pub mod recipe_steps;
 //pub mod recipe_tags;
 
 // pub mod recipe_images;
