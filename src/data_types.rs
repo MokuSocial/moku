@@ -1,23 +1,24 @@
 use async_graphql::{ComplexObject, Enum, Context, SimpleObject};
 
-use crate::db::get_steps;
+use crate::db;
 //use chrono::{DateTime, Utc};
 
 #[derive(SimpleObject, Clone)]
 pub struct Ingredient {
-    id: i64,
+    pub id: i64,
     pub name: String,
     // pub identifier: String,
     // pub wikidata: Option<String>,
     //pub cost_per_unit: Option<f64>,
-    unit: Option<UnitOfMeasure>,
+    pub unit: Option<UnitOfMeasure>,
 }
 
 #[derive(SimpleObject, Clone)]
 pub struct RecipeIngredient {
-    pub ingredient: Ingredient,
+    pub id: i64,
+    pub name: String,
+    pub unit: Option<String>,
     pub quantity: f64,
-    pub unit: Option<UnitOfMeasure>,
 }
 
 #[derive(Enum, Copy, Clone, Eq, PartialEq)]
@@ -74,8 +75,8 @@ pub struct Indication {
 #[ComplexObject]
 impl Recipe {
 
-    async fn ingredients(&self) -> Vec<RecipeIngredient> {
-        vec![] // Placeholder implementation
+    async fn ingredients(&self, ctx: &Context<'_>) -> Vec<RecipeIngredient> {
+        db::get_recipe_ingredients(&ctx.data_unchecked::<sqlx::SqlitePool>(), self.id).await.unwrap_or_default()
     }
 
     async fn indications(&self) -> Indication {
@@ -86,13 +87,13 @@ impl Recipe {
     }
 
     async fn steps(&self, ctx: &Context<'_>) -> Vec<Step> {
-        get_steps(&ctx.data_unchecked::<sqlx::SqlitePool>(), self.id).await.unwrap_or_default()
+        db::get_steps(&ctx.data_unchecked::<sqlx::SqlitePool>(), self.id).await.unwrap_or_default()
     }
 
 }
 
 #[ComplexObject]
-impl Author {
+impl Author { //TODO
     async fn name(&self) -> String {
         self.username.clone()
     }

@@ -24,6 +24,10 @@ impl Query {
       db::get_recipe(&ctx.data_unchecked::<sqlx::SqlitePool>(), id).await.ok()
     }
 
+    /*async fn ingredient(&self, ctx: &Context<'_>, id: i64) -> Option<crate::data_types::Ingredient> {
+      db::get_ingredient(&ctx.data_unchecked::<sqlx::SqlitePool>(), id).await.ok()
+    }*/
+
     async fn recipes(&self, ctx: &Context<'_>) -> QueryRecipeResult {
       QueryRecipeResult {
         //page: 1,

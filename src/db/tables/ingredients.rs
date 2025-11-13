@@ -7,23 +7,13 @@ use std::convert::TryFrom;
 pub struct IngredientDB {
     id : i64,
     name : String,
-    identifier : String,
-    wikidata : Option<String>,
-    cost_per_unit : Option<f64>,
+    //identifier : String,
+    //wikidata : Option<String>,
+    //cost_per_unit : Option<f64>,
     unit : Option<String>,
 }
 
 impl IngredientDB {
-    pub fn new(id: i64, name: String, identifier: String, wikidata: Option<String>, cost_per_unit: Option<f64>, unit: Option<String>) -> Self {
-        Self {
-            id,
-            name,
-            identifier,
-            wikidata,
-            cost_per_unit,
-            unit,
-        }
-    }
 }
 
 impl From<&Ingredient> for IngredientDB {
@@ -32,35 +22,8 @@ impl From<&Ingredient> for IngredientDB {
     }
 }
 
-impl From<Ingredient> for IngredientDB {
-    fn from(ingredient: Ingredient) -> Self {
-        Self {
-            id: ingredient.id,
-            name: ingredient.name,
-            identifier: ingredient.identifier,
-            wikidata: ingredient.wikidata,
-            cost_per_unit: ingredient.cost_per_unit,
-            unit: ingredient.unit.map(|u| u.to_string()),
-        }
-    }
-}
-
-impl TryFrom<IngredientDB> for Ingredient {
-    type Error = String;
-    fn try_from(ingredient_db: IngredientDB) -> Result<Self, Self::Error> {
-        Ok(Self {
-                    id: ingredient_db.id,
-                    name: ingredient_db.name,
-                    identifier: ingredient_db.identifier,
-                    wikidata: ingredient_db.wikidata,
-                    cost_per_unit: ingredient_db.cost_per_unit,
-                    unit: ingredient_db.unit.and_then(|u| UnitOfMeasure::from_str(&u)),
-                })
-    }
-    
-}
-
-pub async fn add_ingredient(
+/*
+pub async fn add(
     db: &sqlx::SqlitePool,
     ingredient: &IngredientDB
 ) -> Result<SqliteQueryResult, sqlx::Error> {
@@ -76,7 +39,7 @@ pub async fn add_ingredient(
     .await
 }
 
-pub async fn get_ingredient(
+pub async fn get(
     db: &sqlx::SqlitePool,
     id: i64
 ) -> Result<IngredientDB, sqlx::Error> {
@@ -100,7 +63,7 @@ pub async fn get_ingredient(
     }
 }
 
-pub async fn delete_ingredient(
+pub async fn delete(
     db: &sqlx::SqlitePool,
     id: i64
 ) -> Result<SqliteQueryResult, sqlx::Error> {
@@ -112,7 +75,7 @@ pub async fn delete_ingredient(
     .await
 }
 
-pub async fn update_ingredient(
+pub async fn update(
     db: &sqlx::SqlitePool,
     id: i64,
     new_name: Option<&str>,
@@ -132,4 +95,4 @@ pub async fn update_ingredient(
     )
     .execute(db)
     .await
-}
+}*/

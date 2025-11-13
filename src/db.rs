@@ -3,7 +3,7 @@
 mod handler;
 mod tables;
 
-use crate::data_types::{Author, Ingredient, Recipe, Step};
+use crate::data_types::{Author, Ingredient, Recipe, Step, RecipeIngredient};
 
 use sqlx::{Pool, Sqlite, SqlitePool};
 
@@ -37,3 +37,15 @@ pub async fn get_steps(db: &SqlitePool, recipe_id: i64) -> Result<Vec<Step>, Str
     let steps: Vec<Step> = steps_db.into_iter().map(|s| Step::from(s)).collect();
     Ok(steps)
 }
+
+pub async fn get_recipe_ingredients(db: &SqlitePool, recipe_id: i64) -> Result<Vec<crate::data_types::RecipeIngredient>, String> {
+    let ri_db = tables::recipe_ingredients::RecipeIngredientDB::gets_by_recepie_id(db, recipe_id).await.map_err(|e| e.to_string())?;
+    let ingredients: Vec<RecipeIngredient> = ri_db.into_iter().map(|ri| crate::data_types::RecipeIngredient::from(ri)).collect();
+    Ok(ingredients)
+}
+
+/*pub async fn get_ingredient(db: &SqlitePool, id: i64) -> Result<Ingredient, String> {
+    let ing_db = tables::ingredients::IngredientDB::get(db, id).await.map_err(|e| e.to_string())?;
+
+    Ok(Ingredient::from(ing_db))
+}*/
