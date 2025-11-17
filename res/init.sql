@@ -35,6 +35,16 @@ CREATE TABLE IF NOT EXISTS recipes (
 	FOREIGN KEY(author) REFERENCES users(username) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TRIGGER IF NOT EXISTS update_recipe_last_updated
+AFTER UPDATE ON recipes
+FOR EACH ROW
+BEGIN
+    UPDATE recipes
+    SET last_updated = CURRENT_TIMESTAMP
+    WHERE id = OLD.id;
+END;
+
+
 CREATE TABLE IF NOT EXISTS recipe_steps (
 	recipe_id INTEGER NOT NULL,
 	step_number INTEGER NOT NULL,
