@@ -38,7 +38,7 @@ pub struct Recipe {
     pub title: String,
     pub banner_url: Option<String>,
     pub servings: u16,
-    pub indication: Indication,
+    pub indications: Indication,
     //pub introduction: String,
     //pub conclusion: String,
     //pub created_at: DateTime<Utc>,

@@ -34,10 +34,10 @@ impl From<Recipe> for RecipeDB {
             author: recipe.author.username,
             title: recipe.title,
             banner_url: recipe.banner_url,
-            prep_time: recipe.indication.prep_time,
-            cook_time: recipe.indication.cook_time,
-            rest_time: recipe.indication.rest_time,
-            difficulty: recipe.indication.difficulty,
+            prep_time: recipe.indications.prep_time,
+            cook_time: recipe.indications.cook_time,
+            rest_time: recipe.indications.rest_time,
+            difficulty: recipe.indications.difficulty,
             vote_count: recipe.votes,
             vote_average: recipe.vote_average,
             servings: recipe.servings,
@@ -57,7 +57,7 @@ impl From<RecipeDB> for Recipe {
         author,
         title: rec_db.title,
         banner_url: rec_db.banner_url,
-        indication: Indication {
+        indications: Indication {
             prep_time: rec_db.prep_time,
             cook_time: rec_db.cook_time,
             rest_time: rec_db.rest_time,

@@ -21,14 +21,11 @@ impl Query {
     }
 
     async fn recipe(&self, ctx: &Context<'_>, id: i64) -> Option<Recipe> {
-      let has_indications = ctx.look_ahead()
-        .field("recipe")
-        .selection_fields()
-        .iter().fold(false, |acc, e| acc || e.name() == "indication");
-
-      if has_indications {
+      if ctx.look_ahead().field("indications").exists() {
+        println!("Fetching recipe with indications");
         db::get_recipe_with_indications(&ctx.data_unchecked::<sqlx::SqlitePool>(), id).await.ok()
       } else {
+        println!("Fetching recipe without indications");
         db::get_recipe(&ctx.data_unchecked::<sqlx::SqlitePool>(), id).await.ok()
       }
     }
