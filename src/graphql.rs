@@ -21,12 +21,17 @@ impl Query {
     }
 
     async fn recipe(&self, ctx: &Context<'_>, id: i64) -> Option<Recipe> {
-      db::get_recipe(&ctx.data_unchecked::<sqlx::SqlitePool>(), id).await.ok()
-    }
+      let has_indications = ctx.look_ahead()
+        .field("recipe")
+        .selection_fields()
+        .iter().fold(false, |acc, e| acc || e.name() == "indication");
 
-    /*async fn ingredient(&self, ctx: &Context<'_>, id: i64) -> Option<crate::data_types::Ingredient> {
-      db::get_ingredient(&ctx.data_unchecked::<sqlx::SqlitePool>(), id).await.ok()
-    }*/
+      if has_indications {
+        db::get_recipe_with_indications(&ctx.data_unchecked::<sqlx::SqlitePool>(), id).await.ok()
+      } else {
+        db::get_recipe(&ctx.data_unchecked::<sqlx::SqlitePool>(), id).await.ok()
+      }
+    }
 
     async fn recipes(&self, ctx: &Context<'_>) -> QueryRecipeResult {
       QueryRecipeResult {

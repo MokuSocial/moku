@@ -38,6 +38,7 @@ pub struct Recipe {
     pub title: String,
     pub banner_url: Option<String>,
     pub servings: u16,
+    pub indication: Indication,
     //pub introduction: String,
     //pub conclusion: String,
     //pub created_at: DateTime<Utc>,
@@ -68,8 +69,14 @@ pub struct Tag {
 
 #[derive(SimpleObject, Clone)]
 pub struct Indication {
-    pub label: String,
-    pub value: String,
+    /*prepTime: number;
+    cookTime: number;
+    restTime?: number;
+    difficulty: 'easy' | 'medium' | 'hard';*/
+    pub prep_time: u32,
+    pub cook_time: u32,
+    pub rest_time: Option<u32>,
+    pub difficulty: String,
 }
 
 #[ComplexObject]
@@ -77,13 +84,6 @@ impl Recipe {
 
     async fn ingredients(&self, ctx: &Context<'_>) -> Vec<RecipeIngredient> {
         db::get_recipe_ingredients(&ctx.data_unchecked::<sqlx::SqlitePool>(), self.id).await.unwrap_or_default()
-    }
-
-    async fn indications(&self) -> Indication {
-        Indication { // Placeholder implementation
-            label: "Unimplemented".to_string(),
-            value: "Pleas wait our slow devs".to_string(),
-        }
     }
 
     async fn steps(&self, ctx: &Context<'_>) -> Vec<Step> {

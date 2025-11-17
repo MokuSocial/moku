@@ -24,6 +24,10 @@ CREATE TABLE IF NOT EXISTS recipes (
 	servings INTEGER NOT NULL,
 	-- introduction TEXT NOT NULL,
 	-- conclusion TEXT NOT NULL,
+	prep_time INTEGER NOT NULL,
+	cook_time INTEGER NOT NULL,
+	rest_time INTEGER,
+	difficulty TEXT CHECK (difficulty IN ('easy', 'medium', 'hard')) NOT NULL,
 	created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
 	last_updated INTEGER DEFAULT NULL,
 	vote_count INTEGER NOT NULL DEFAULT 0,
@@ -59,10 +63,3 @@ CREATE TABLE IF NOT EXISTS recipe_tags (
 	FOREIGN KEY(tag_id) REFERENCES tags(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS indications (
-	recipe_id INTEGER NOT NULL,
-	tag_id INTEGER NOT NULL,
-	value TEXT NOT NULL,
-	FOREIGN KEY(recipe_id) REFERENCES recipes(id) ON DELETE CASCADE,
-	FOREIGN KEY(tag_id) REFERENCES tags(id) ON DELETE CASCADE
-);

@@ -28,7 +28,11 @@ pub trait FromDB<T> {
 
 pub async fn get_recipe(db: &SqlitePool, id: i64) -> Result<Recipe, String> {
     let rec_db = tables::recipes::RecipeDB::get(db, id).await.map_err(|e| e.to_string())?;
+    Ok(Recipe::from(rec_db))
+}
 
+pub async fn get_recipe_with_indications(db: &SqlitePool, id: i64) -> Result<Recipe, String> {
+    let rec_db = tables::recipes::RecipeDB::get_recipe_with_indications(db, id).await.map_err(|e| e.to_string())?;
     Ok(Recipe::from(rec_db))
 }
 
