@@ -48,6 +48,12 @@ pub async fn get_recipe_ingredients(db: &SqlitePool, recipe_id: i64) -> Result<V
     Ok(ingredients)
 }
 
+pub async fn get_recipes(db: &SqlitePool) -> Result<Vec<Recipe>, String> {
+    let recs_db = tables::recipes::RecipeDB::gets(db).await.map_err(|e| e.to_string())?;
+    let recipes: Vec<Recipe> = recs_db.into_iter().map(|r| Recipe::from(r)).collect();
+    Ok(recipes)
+}
+
 /*pub async fn get_ingredient(db: &SqlitePool, id: i64) -> Result<Ingredient, String> {
     let ing_db = tables::ingredients::IngredientDB::get(db, id).await.map_err(|e| e.to_string())?;
 

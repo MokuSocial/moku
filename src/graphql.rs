@@ -31,11 +31,13 @@ impl Query {
     }
 
     async fn recipes(&self, ctx: &Context<'_>) -> QueryRecipeResult {
+      let recs = db::get_recipes(&ctx.data_unchecked::<sqlx::SqlitePool>()).await.unwrap_or_default();
+      let recs_len = recs.len();
       QueryRecipeResult {
         //page: 1,
-        results: vec![],
+        results: recs,
         //total_pages: 1,
-        total_results: 0,
+        total_results: recs_len as i32,
       }
 
     }
