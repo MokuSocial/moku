@@ -32,10 +32,12 @@ impl Query {
 
     async fn recipes(&self, ctx: &Context<'_>,
       after: Option<String>,
-      before: Option<String>,
+      //before: Option<String>,
       first: Option<i32>,
-      last: Option<i32>
+      //last: Option<i32>
       ) -> Result<Connection<i64, Recipe, EmptyFields, EmptyFields>> {
+      let before: Option<String> = None;
+      let last: Option<i32> = None;
       query(after, before, first, last, |after, before, first, last| async move {
         if before.is_some() || last.is_some() {
             return Err(async_graphql::Error::new("Backward pagination is not supported, yet"));

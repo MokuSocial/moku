@@ -1,62 +1,137 @@
--- ================================
--- DATI DI ESEMPIO
--- ================================
-
-INSERT INTO users (username, password_hash, email, created_at) VALUES
-('alice', 'hash1', 'alice@example.com', strftime('%s','now')),
-('bob', 'hash2', 'bob@example.com', strftime('%s','now')),
-('carol', 'hash3', 'carol@example.com', strftime('%s','now'));
-
-INSERT INTO ingredients (name, unit) VALUES
-('Pomodori pelati', 'g'),
-('Spaghetti', 'g'),
-('Olio d''oliva', 'ml'),
-('Aglio', 'piece'),
-('Basilico fresco', 'g'),
-('Sale', 'g'),
-('Pepe nero', 'g'),
-('Parmigiano grattugiato', 'g'),
-('Uova', 'piece'),
-('Pancetta', 'g');
-
-INSERT INTO tags (text) VALUES
-('vegetariano'),
-('italiano'),
-('pasta'),
-('veloce'),
-('classico');
-
-INSERT INTO recipes (author, title, banner_image_url, servings, prep_time, cook_time, rest_time, difficulty) VALUES
-('alice', 'Spaghetti al pomodoro', 'https://example.com/spaghetti.jpg', 4, 20, 15, NULL, 'easy'),
-('bob', 'Carbonara', 'https://example.com/carbonara.jpg', 4, 15, 10, NULL, 'medium');
-
-INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit) VALUES
-(1, 2, 200, 'g'),
-(1, 1, 400, 'g'),
-(1, 3, 30, 'ml'),
-(1, 4, 1, 'piece'),
-(1, 5, 5, 'g'),
-(1, 6, 3, 'g'),
-(1, 7, 1, 'g'),
-(2, 2, 200, 'g'),
-(2, 10, 100, 'g'),
-(2, 9, 2, 'piece'),
-(2, 6, 2, 'g'),
-(2, 7, 1, 'g'),
-(2, 8, 30, 'g');
-
-INSERT INTO recipe_steps (recipe_id, step_number, description) VALUES
-(1, 1, 'Porta a ebollizione una pentola d''acqua salata.'),
-(1, 2, 'Cuoci gli spaghetti al dente.'),
-(1, 3, 'In una padella, soffriggi l''aglio nell''olio.'),
-(1, 4, 'Aggiungi i pomodori pelati e cuoci per 10 minuti.'),
-(1, 5, 'Scola la pasta e uniscila al sugo con il basilico. Servi caldo.'),
-(2, 1, 'Cuoci la pancetta in padella finché è croccante.'),
-(2, 2, 'Sbatti le uova con il parmigiano, sale e pepe.'),
-(2, 3, 'Cuoci la pasta e scolala al dente.'),
-(2, 4, 'Unisci la pasta alla pancetta, togli dal fuoco e aggiungi il composto di uova.'),
-(2, 5, 'Mescola velocemente e servi subito.');
-
-INSERT INTO recipe_tags (recipe_id, tag_id) VALUES
-(1, 1), (1, 2), (1, 3), (1, 4),
-(2, 2), (2, 3), (2, 5);
+BEGIN TRANSACTION;
+INSERT INTO "ingredients" VALUES (1,'Pomodori pelati','g');
+INSERT INTO "ingredients" VALUES (2,'Spaghetti','g');
+INSERT INTO "ingredients" VALUES (3,'Olio d''oliva','ml');
+INSERT INTO "ingredients" VALUES (4,'Aglio','piece');
+INSERT INTO "ingredients" VALUES (5,'Basilico fresco','g');
+INSERT INTO "ingredients" VALUES (6,'Sale','g');
+INSERT INTO "ingredients" VALUES (7,'Pepe nero','g');
+INSERT INTO "ingredients" VALUES (8,'Parmigiano grattugiato','g');
+INSERT INTO "ingredients" VALUES (9,'Uova','piece');
+INSERT INTO "ingredients" VALUES (10,'Pancetta','g');
+INSERT INTO "ingredients" VALUES (11,'Asparagi','g');
+INSERT INTO "ingredients" VALUES (12,'Riso Carnaroli','g');
+INSERT INTO "ingredients" VALUES (13,'Funghi porcini','g');
+INSERT INTO "ingredients" VALUES (14,'Burro','g');
+INSERT INTO "ingredients" VALUES (15,'Vino bianco','ml');
+INSERT INTO "ingredients" VALUES (16,'Brodo vegetale','ml');
+INSERT INTO "ingredients" VALUES (17,'Mascarpone','g');
+INSERT INTO "ingredients" VALUES (18,'Savoiardi','g');
+INSERT INTO "ingredients" VALUES (19,'Caffè','ml');
+INSERT INTO "ingredients" VALUES (20,'Zucchero','g');
+INSERT INTO "ingredients" VALUES (21,'Cacao amaro','g');
+INSERT INTO "ingredients" VALUES (22,'Cetrioli','g');
+INSERT INTO "ingredients" VALUES (23,'Pomodori','g');
+INSERT INTO "ingredients" VALUES (24,'Feta','g');
+INSERT INTO "ingredients" VALUES (25,'Olive nere','g');
+INSERT INTO "ingredients" VALUES (26,'Origano','g');
+INSERT INTO "ingredients" VALUES (27,'Petto di pollo','g');
+INSERT INTO "ingredients" VALUES (28,'Latte di cocco','ml');
+INSERT INTO "ingredients" VALUES (29,'Curry in polvere','g');
+INSERT INTO "ingredients" VALUES (30,'Riso basmati','g');
+INSERT INTO "recipe_ingredients" VALUES (1,2,200.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (1,1,400.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (1,3,30.0,'ml');
+INSERT INTO "recipe_ingredients" VALUES (1,4,1.0,'piece');
+INSERT INTO "recipe_ingredients" VALUES (1,5,5.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (1,6,3.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (1,7,1.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (2,2,200.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (2,10,100.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (2,9,2.0,'piece');
+INSERT INTO "recipe_ingredients" VALUES (2,6,2.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (2,7,1.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (2,8,30.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (3,11,320.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (3,12,250.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (3,13,40.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (3,14,50.0,'ml');
+INSERT INTO "recipe_ingredients" VALUES (3,15,900.0,'ml');
+INSERT INTO "recipe_ingredients" VALUES (3,3,20.0,'ml');
+INSERT INTO "recipe_ingredients" VALUES (3,6,3.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (4,16,500.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (4,17,250.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (4,18,200.0,'ml');
+INSERT INTO "recipe_ingredients" VALUES (4,19,120.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (4,9,3.0,'piece');
+INSERT INTO "recipe_ingredients" VALUES (4,20,15.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (5,21,150.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (5,22,200.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (5,23,120.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (5,24,50.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (5,3,20.0,'ml');
+INSERT INTO "recipe_ingredients" VALUES (5,25,2.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (5,6,2.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (6,26,500.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (6,27,400.0,'ml');
+INSERT INTO "recipe_ingredients" VALUES (6,28,15.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (6,3,20.0,'ml');
+INSERT INTO "recipe_ingredients" VALUES (6,6,3.0,'g');
+INSERT INTO "recipe_ingredients" VALUES (6,29,200.0,'g');
+INSERT INTO "recipe_steps" VALUES (1,1,'Porta a ebollizione una pentola d''acqua salata.',NULL);
+INSERT INTO "recipe_steps" VALUES (1,2,'Cuoci gli spaghetti al dente.',NULL);
+INSERT INTO "recipe_steps" VALUES (1,3,'In una padella, soffriggi l''aglio nell''olio.',NULL);
+INSERT INTO "recipe_steps" VALUES (1,4,'Aggiungi i pomodori pelati e cuoci per 10 minuti.',NULL);
+INSERT INTO "recipe_steps" VALUES (1,5,'Scola la pasta e uniscila al sugo con il basilico. Servi caldo.',NULL);
+INSERT INTO "recipe_steps" VALUES (2,1,'Cuoci la pancetta in padella finché è croccante.',NULL);
+INSERT INTO "recipe_steps" VALUES (2,2,'Sbatti le uova con il parmigiano, sale e pepe.',NULL);
+INSERT INTO "recipe_steps" VALUES (2,3,'Cuoci la pasta e scolala al dente.',NULL);
+INSERT INTO "recipe_steps" VALUES (2,4,'Unisci la pasta alla pancetta, togli dal fuoco e aggiungi il composto di uova.',NULL);
+INSERT INTO "recipe_steps" VALUES (2,5,'Mescola velocemente e servi subito.',NULL);
+INSERT INTO "recipe_steps" VALUES (3,1,'Pulisci e taglia i funghi.',NULL);
+INSERT INTO "recipe_steps" VALUES (3,2,'Falli rosolare in padella con olio.',NULL);
+INSERT INTO "recipe_steps" VALUES (3,3,'In un’altra pentola tosta il riso con metà burro.',NULL);
+INSERT INTO "recipe_steps" VALUES (3,4,'Sfuma con vino bianco.',NULL);
+INSERT INTO "recipe_steps" VALUES (3,5,'Aggiungi il brodo poco alla volta finché il risotto è cremoso.',NULL);
+INSERT INTO "recipe_steps" VALUES (3,6,'Unisci i funghi e manteca con il burro restante.',NULL);
+INSERT INTO "recipe_steps" VALUES (4,1,'Separa tuorli e albumi, monta i tuorli con lo zucchero.',NULL);
+INSERT INTO "recipe_steps" VALUES (4,2,'Aggiungi il mascarpone e incorpora delicatamente.',NULL);
+INSERT INTO "recipe_steps" VALUES (4,3,'Monta gli albumi e aggiungili alla crema.',NULL);
+INSERT INTO "recipe_steps" VALUES (4,4,'Immergi i savoiardi nel caffè.',NULL);
+INSERT INTO "recipe_steps" VALUES (4,5,'Stratifica savoiardi e crema, poi spolvera con cacao.',NULL);
+INSERT INTO "recipe_steps" VALUES (4,6,'Lascia riposare in frigo 2 ore.',NULL);
+INSERT INTO "recipe_steps" VALUES (5,1,'Taglia pomodori e cetrioli.',NULL);
+INSERT INTO "recipe_steps" VALUES (5,2,'Aggiungi la feta a cubetti.',NULL);
+INSERT INTO "recipe_steps" VALUES (5,3,'Unisci le olive e condisci con olio, sale e origano.',NULL);
+INSERT INTO "recipe_steps" VALUES (6,1,'Taglia il pollo a cubetti e rosolalo con olio.',NULL);
+INSERT INTO "recipe_steps" VALUES (6,2,'Aggiungi il curry e fai insaporire.',NULL);
+INSERT INTO "recipe_steps" VALUES (6,3,'Unisci il latte di cocco e cuoci 25 minuti.',NULL);
+INSERT INTO "recipe_steps" VALUES (6,4,'Cuoci il riso basmati a parte.',NULL);
+INSERT INTO "recipe_steps" VALUES (6,5,'Servi il pollo con il riso.',NULL);
+INSERT INTO "recipe_tags" VALUES (1,1);
+INSERT INTO "recipe_tags" VALUES (1,2);
+INSERT INTO "recipe_tags" VALUES (1,3);
+INSERT INTO "recipe_tags" VALUES (1,4);
+INSERT INTO "recipe_tags" VALUES (2,2);
+INSERT INTO "recipe_tags" VALUES (2,3);
+INSERT INTO "recipe_tags" VALUES (2,5);
+INSERT INTO "recipe_tags" VALUES (3,2);
+INSERT INTO "recipe_tags" VALUES (3,5);
+INSERT INTO "recipe_tags" VALUES (4,6);
+INSERT INTO "recipe_tags" VALUES (4,5);
+INSERT INTO "recipe_tags" VALUES (5,1);
+INSERT INTO "recipe_tags" VALUES (5,2);
+INSERT INTO "recipe_tags" VALUES (5,7);
+INSERT INTO "recipe_tags" VALUES (6,8);
+INSERT INTO "recipe_tags" VALUES (6,9);
+INSERT INTO "recipes" VALUES (1,'alice','Spaghetti al pomodoro','https://example.com/spaghetti.jpg',4,20,15,NULL,'easy',1763380200,NULL,0,0.0);
+INSERT INTO "recipes" VALUES (2,'bob','Carbonara','https://example.com/carbonara.jpg',4,15,10,NULL,'medium',1763380200,NULL,0,0.0);
+INSERT INTO "recipes" VALUES (3,'alice','Risotto ai funghi','https://example.com/risotto.jpg',4,15,25,NULL,'medium',1763552301,NULL,0,0.0);
+INSERT INTO "recipes" VALUES (4,'carol','Tiramisù','https://example.com/tiramisu.jpg',6,25,0,120,'medium',1763552301,NULL,0,0.0);
+INSERT INTO "recipes" VALUES (5,'eva','Insalata greca','https://example.com/greca.jpg',2,10,0,NULL,'easy',1763552301,NULL,0,0.0);
+INSERT INTO "recipes" VALUES (6,'dave','Pollo al curry','https://example.com/curry.jpg',4,20,30,NULL,'medium',1763552301,NULL,0,0.0);
+INSERT INTO "tags" VALUES (1,'vegetariano');
+INSERT INTO "tags" VALUES (2,'italiano');
+INSERT INTO "tags" VALUES (3,'pasta');
+INSERT INTO "tags" VALUES (4,'veloce');
+INSERT INTO "tags" VALUES (5,'classico');
+INSERT INTO "tags" VALUES (6,'dessert');
+INSERT INTO "tags" VALUES (7,'senza_glutine');
+INSERT INTO "tags" VALUES (8,'speziato');
+INSERT INTO "tags" VALUES (9,'orientale');
+INSERT INTO "users" VALUES ('alice','hash1','alice@example.com',1763380200);
+INSERT INTO "users" VALUES ('bob','hash2','bob@example.com',1763380200);
+INSERT INTO "users" VALUES ('carol','hash3','carol@example.com',1763380200);
+INSERT INTO "users" VALUES ('dave','hash4','dave@example.com',1763552201);
+INSERT INTO "users" VALUES ('eva','hash5','eva@example.com',1763552201);
+COMMIT;
