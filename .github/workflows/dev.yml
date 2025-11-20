@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - run: cargo build --release
+      - run: cargo build
       - uses: appleboy/ssh-action@v1.1.0
         with:
           host: ${{ vars.HOST_DEV }}
