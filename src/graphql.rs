@@ -1,9 +1,8 @@
 use async_graphql::{Context, Object, SimpleObject, Result, connection::{EmptyFields, Connection, Edge, query}};
 use crate::{data_types::Recipe, db::DatabaseHandler};
 
-/*
+pub mod mutation;
 
-*/
 #[derive(SimpleObject)]
 pub struct QueryRecipeResult {
     //pub page: i32,
