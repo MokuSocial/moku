@@ -1,34 +1,30 @@
-use axum::{routing::{get, post}, Router};
+use axum::{routing::get, Router};
 use std::net::SocketAddr;
 use tokio;
 use tower_http::cors::{Any, CorsLayer};
+use async_graphql::{EmptySubscription, Schema};
+use async_graphql_axum::{GraphQL};
 
-use async_graphql::{Schema, EmptyMutation, EmptySubscription};
-use async_graphql_axum::GraphQLRequest;
-use async_graphql_axum::GraphQLResponse;
+use crate::db::DatabaseHandler;
+use crate::graphql::{Query,mutation::Mutation};
 
 //mod data_spot;
 mod graphql;
 mod db;
 mod data_types;
 
-
-// Handler per GraphQL
-async fn graphql_handler(req: GraphQLRequest) -> GraphQLResponse {
-    let schema = Schema::build(graphql::Query, EmptyMutation, EmptySubscription)
-        .data(db::setup().await.expect("Failed to set up database"))
-        .finish();
-    schema.execute(req.into_inner()).await.into()
-}
-
 #[tokio::main]
 async fn main() {
     // Inizializza il database
-    let setup = setup();
-    //let pool = db::setup().await.expect("Failed to set up database");
+    let db = DatabaseHandler::new().await.expect("Failed to initialize database");
+
+    let schema = Schema::build(Query, Mutation, EmptySubscription)
+        .data(db.clone())
+        .finish();
+
     // Configura il router con una route di test
     let app = Router::new()
-        .route("/graphql", post(graphql_handler))
+        .route_service( "/graphql", GraphQL::new(schema)).with_state(db)
         .route("/", get(|| async { "Hello, Axum!" }))
         .layer(CorsLayer::new().allow_origin(Any));
 
@@ -37,10 +33,6 @@ async fn main() {
     println!("Server in esecuzione su http://{}", addr);
 
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
-    // Avvia il server
-    setup.await;
-    axum::serve(listener, app.into_make_service()).await.unwrap();
-}
 
-async fn setup() {
+    axum::serve(listener, app.into_make_service()).await.unwrap();
 }

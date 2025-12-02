@@ -1,6 +1,6 @@
 use async_graphql::{ComplexObject, Enum, Context, SimpleObject};
 
-use crate::db;
+use crate::db::DatabaseHandler;
 //use chrono::{DateTime, Utc};
 
 #[derive(SimpleObject, Clone)]
@@ -83,11 +83,13 @@ pub struct Indication {
 impl Recipe {
 
     async fn ingredients(&self, ctx: &Context<'_>) -> Vec<RecipeIngredient> {
-        db::get_recipe_ingredients(&ctx.data_unchecked::<sqlx::SqlitePool>(), self.id).await.unwrap_or_default()
+        let db = ctx.data::<DatabaseHandler>().unwrap();
+        db.get_recipe_ingredients(self.id).await.unwrap_or_default()
     }
 
     async fn steps(&self, ctx: &Context<'_>) -> Vec<Step> {
-        db::get_steps(&ctx.data_unchecked::<sqlx::SqlitePool>(), self.id).await.unwrap_or_default()
+        let db = ctx.data::<DatabaseHandler>().unwrap();
+        db.get_steps(self.id).await.unwrap_or_default()
     }
 
 }

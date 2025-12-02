@@ -1,9 +1,8 @@
 use async_graphql::{Context, Object, SimpleObject, Result, connection::{EmptyFields, Connection, Edge, query}};
-use crate::{data_types::Recipe, db};
+use crate::{data_types::Recipe, db::DatabaseHandler};
 
-/*
+pub mod mutation;
 
-*/
 #[derive(SimpleObject)]
 pub struct QueryRecipeResult {
     //pub page: i32,
@@ -21,12 +20,14 @@ impl Query {
     }
 
     async fn recipe(&self, ctx: &Context<'_>, id: i64) -> Option<Recipe> {
+      let db = ctx.data::<DatabaseHandler>().unwrap();
+
       if ctx.look_ahead().field("indications").exists() {
         println!("Fetching recipe with indications");
-        db::get_recipe_with_indications(&ctx.data_unchecked::<sqlx::SqlitePool>(), id).await.ok()
+        db.get_recipe_with_indications(id).await.ok()
       } else {
         println!("Fetching recipe without indications");
-        db::get_recipe(&ctx.data_unchecked::<sqlx::SqlitePool>(), id).await.ok()
+        db.get_recipe(id).await.ok()
       }
     }
 
@@ -36,13 +37,14 @@ impl Query {
       first: Option<i32>,
       //last: Option<i32>
       ) -> Result<Connection<i64, Recipe, EmptyFields, EmptyFields>> {
+      let db = ctx.data::<DatabaseHandler>().unwrap();
       let before: Option<String> = None;
       let last: Option<i32> = None;
       query(after, before, first, last, |after, before, first, last| async move {
         if before.is_some() || last.is_some() {
             return Err(async_graphql::Error::new("Backward pagination is not supported, yet"));
         }
-        let recs = db::get_recipes(&ctx.data_unchecked::<sqlx::SqlitePool>(), first.map(|e| e as i64), after).await.unwrap_or_default();
+        let recs = db.get_recipes(first.map(|e| e as i64), after).await.unwrap_or_default();
 
         let mut connection = Connection::new(false, false);
 
