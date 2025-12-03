@@ -1,7 +1,7 @@
 use axum::{routing::get, Router};
 use std::net::SocketAddr;
 use tokio;
-use tower_http::cors::{Any, CorsLayer};
+use tower_http::cors::{CorsLayer};
 use async_graphql::{EmptySubscription, Schema};
 use async_graphql_axum::{GraphQL};
 
@@ -26,7 +26,7 @@ async fn main() {
     let app = Router::new()
         .route_service( "/graphql", GraphQL::new(schema)).with_state(db)
         .route("/", get(|| async { "Hello, Axum!" }))
-        .layer(CorsLayer::new().allow_origin(Any));
+        .layer(CorsLayer::permissive());
 
     // Imposta l'indirizzo del server
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
