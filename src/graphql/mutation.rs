@@ -1,5 +1,7 @@
 use async_graphql::{Object, SimpleObject};
 
+use crate::auth;
+
 
 pub struct Mutation;
 
@@ -11,8 +13,8 @@ impl Mutation {
         if username == "admin" && password == "password" {
             LoginResponse {
                 success: true,
-                token: "fake-jwt-token".to_string().into(),
-                refresh_token: "fake-refresh-token".to_string().into(),
+                token: auth::token(username.as_str()).into(),
+                refresh_token: auth::refresh_token(username.as_str()).into(),
                 username: username.into(),
                 expires_in: 3600.into(),
             }

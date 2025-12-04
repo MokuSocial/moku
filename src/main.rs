@@ -12,6 +12,7 @@ use crate::graphql::{Query,mutation::Mutation};
 mod graphql;
 mod db;
 mod data_types;
+mod auth;
 
 #[tokio::main]
 async fn main() {
