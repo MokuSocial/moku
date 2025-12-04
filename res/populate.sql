@@ -129,9 +129,9 @@ INSERT INTO "tags" VALUES (6,'dessert');
 INSERT INTO "tags" VALUES (7,'senza_glutine');
 INSERT INTO "tags" VALUES (8,'speziato');
 INSERT INTO "tags" VALUES (9,'orientale');
-INSERT INTO "users" VALUES ('alice','hash1','alice@example.com',1763380200);
-INSERT INTO "users" VALUES ('bob','hash2','bob@example.com',1763380200);
-INSERT INTO "users" VALUES ('carol','hash3','carol@example.com',1763380200);
-INSERT INTO "users" VALUES ('dave','hash4','dave@example.com',1763552201);
-INSERT INTO "users" VALUES ('eva','hash5','eva@example.com',1763552201);
+INSERT INTO "users" VALUES ('alice','$argon2id$v=19$m=19456,t=2,p=1$uso5kK+zN7v2xnzBrX0qXg$S6T5vtLN7b6nNXzLOxswQO/DWrJDvNZuN+Xf4K5s/W4','alice@example.com',1763380200); -- Password: hash1
+INSERT INTO "users" VALUES ('bob','$argon2id$v=19$m=19456,t=2,p=1$uxkapE9/PASTLT60T+Z88Q$F27hdof+Uc1jbC0wN8l5ezAOLOeSGAlTyZSudJ1HGec','bob@example.com',1763380200); -- Password: hash2
+INSERT INTO "users" VALUES ('carol','$argon2id$v=19$m=19456,t=2,p=1$bAqkGPWk4igSVLJhqWH8pw$yDF+0yFG60MbLDj4I0BGXI35Qxo7pw8xyuoCfCpziJc','carol@example.com',1763380200); -- Password: hash3
+INSERT INTO "users" VALUES ('dave','$argon2id$v=19$m=19456,t=2,p=1$uS+qEiqQDKAwQCZOy0NrVw$1WjiVcEwi46ndx/2NofZoxHNsmBwzwQVl4HIYj+HCqw','dave@example.com',1763552201); -- Password: hash4
+INSERT INTO "users" VALUES ('eva','$argon2id$v=19$m=19456,t=2,p=1$zNxjpY8pK8iUBmSVKUUTDQ$2d3ZwGEhhTWsapWRxQipYBMyBhX2jm77h9kovU3wW68','eva@example.com',1763552201); -- Password: hash5
 COMMIT;

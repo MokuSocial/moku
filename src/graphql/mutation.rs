@@ -1,23 +1,26 @@
-use async_graphql::{Object, SimpleObject};
+use async_graphql::{Object, SimpleObject, Context};
+use crate::db::DatabaseHandler;
+
+use crate::auth::{self, authenticate};
 
 
 pub struct Mutation;
 
 #[Object]
 impl Mutation {
-    async fn login(&self, username: String, password: String) -> LoginResponse {
+    async fn login(&self, ctx: &Context<'_>, username: String, password: String) -> LoginResponse {
         // Here you would normally check the username and password against your database
         // For simplicity, we'll just return true if the username is "admin" and the password is "password"
-        if username == "admin" && password == "password" {
-            LoginResponse {
+        let db = ctx.data::<DatabaseHandler>().unwrap();
+        match authenticate(username.as_str(), password.as_str(), db).await {
+            Some((token,refresh_token)) => LoginResponse {
                 success: true,
-                token: "fake-jwt-token".to_string().into(),
-                refresh_token: "fake-refresh-token".to_string().into(),
+                token: token.into(),
+                refresh_token: refresh_token.into(),
                 username: username.into(),
                 expires_in: 3600.into(),
-            }
-        } else {
-            LoginResponse {
+            },
+            None => LoginResponse {
                 success: false,
                 token: None,
                 refresh_token: None,
@@ -26,6 +29,10 @@ impl Mutation {
             }
         }
     }
+
+    /*async fn hasher(&self, password: String) -> String {
+        auth::hash_password(password.as_str())
+    }*/
 }
 
 #[derive(SimpleObject, Clone)]

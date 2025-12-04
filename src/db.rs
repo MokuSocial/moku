@@ -56,6 +56,10 @@ impl DatabaseHandler {
         let recipes: Vec<Recipe> = recs_db.into_iter().map(|r| Recipe::from(r)).collect();
         Ok(recipes)
     }
+
+    pub async fn user_password(self: &Self, username: &str) -> Result<String, String> {
+        tables::users::UserDB::get_password_hash(&self.pool, username).await.map_err(|e| e.to_string())
+    }
 }
 /*pub async fn get_ingredient(db: &SqlitePool, id: i64) -> Result<Ingredient, String> {
     let ing_db = tables::ingredients::IngredientDB::get(&db.pool, id).await.map_err(|e| e.to_string())?;
