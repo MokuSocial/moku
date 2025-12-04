@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use jsonwebtoken::{encode, decode, Header, Algorithm, Validation, EncodingKey, DecodingKey};
 
+use crate::db::{self, DatabaseHandler};
+
 const SECRET : &str = "secret_key";
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -38,10 +40,18 @@ pub fn validate_jwt(token: &str) -> Result<Claims, jsonwebtoken::errors::Error> 
     Ok(token_data.claims)
 }
 
-pub fn token(username: &str) -> String {
+fn token(username: &str) -> String {
     create_jwt(username, 3600, Some("token"))
 }
 
-pub fn refresh_token(username: &str) -> String {
+fn refresh_token(username: &str) -> String {
     create_jwt(username, 3600*24, Some("refresh_token"))
+}
+
+pub async fn authenticate(username: &str, password: &str, db: &DatabaseHandler) -> Option<(String,String)> {
+    let hash = password;
+    match db.authenticate_user(username, hash).await {
+        Ok(true) => Some((token(username),refresh_token(username))),
+        _ => None,
+    } 
 }
