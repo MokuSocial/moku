@@ -30,9 +30,9 @@ impl Mutation {
         }
     }
 
-    async fn hasher(&self, password: String) -> String {
+    /*async fn hasher(&self, password: String) -> String {
         auth::hash_password(password.as_str())
-    }
+    }*/
 }
 
 #[derive(SimpleObject, Clone)]
