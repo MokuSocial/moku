@@ -14,19 +14,19 @@ pub struct UserDB {
 //}
 
 impl UserDB {
-    pub async fn authenticate(
+
+    pub async fn get_password_hash(
         db: &sqlx::SqlitePool,
-        username: &str,
-        password_hash: &str
-    ) -> Result<bool, sqlx::Error> {
-        let user = sqlx::query!(
-            "SELECT username FROM users WHERE username = ? AND password_hash = ?",
-            username,
-            password_hash
+        username: &str
+    ) -> Result<String, sqlx::Error> {
+        let record = sqlx::query!(
+            "SELECT password_hash FROM users WHERE username = ?",
+            username
         )
-        .fetch_optional(db)
+        .fetch_one(db)
         .await?;
-        Ok(user.is_some())
+
+        Ok(record.password_hash)
     }
 }
 /*

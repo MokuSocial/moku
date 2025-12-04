@@ -57,8 +57,8 @@ impl DatabaseHandler {
         Ok(recipes)
     }
 
-    pub async fn authenticate_user(self: &Self, username: &str, password: &str) -> Result<bool, String> {
-        tables::users::UserDB::authenticate(&self.pool, username, password).await.map_err(|e| e.to_string())
+    pub async fn user_password(self: &Self, username: &str) -> Result<String, String> {
+        tables::users::UserDB::get_password_hash(&self.pool, username).await.map_err(|e| e.to_string())
     }
 }
 /*pub async fn get_ingredient(db: &SqlitePool, id: i64) -> Result<Ingredient, String> {

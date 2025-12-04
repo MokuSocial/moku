@@ -1,7 +1,8 @@
+use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier, password_hash::{self, SaltString, rand_core::OsRng}};
 use serde::{Deserialize, Serialize};
 use jsonwebtoken::{encode, decode, Header, Algorithm, Validation, EncodingKey, DecodingKey};
 
-use crate::db::{self, DatabaseHandler};
+use crate::db::DatabaseHandler;
 
 const SECRET : &str = "secret_key";
 
@@ -49,9 +50,29 @@ fn refresh_token(username: &str) -> String {
 }
 
 pub async fn authenticate(username: &str, password: &str, db: &DatabaseHandler) -> Option<(String,String)> {
-    let hash = password;
-    match db.authenticate_user(username, hash).await {
-        Ok(true) => Some((token(username),refresh_token(username))),
-        _ => None,
-    } 
+    let password_hash = db.user_password(username).await.ok()?;
+    if verify_password(password, password_hash) {
+        Some((token(username),refresh_token(username)))
+    }
+    else {
+        None
+    }
+}
+
+pub fn hash_password(password: &str) -> String {
+    let salt = SaltString::generate(&mut OsRng);
+    let argon2 = Argon2::default();
+    argon2.hash_password(password.as_bytes(), &salt).expect("Password hashing failed").to_string()
+    //password_hash.to_vec().iter().map(|b| format!("{:02x}", b)).collect()
+}
+
+pub fn verify_password(password: &str, hash: String) -> bool {
+    let parsed_hash = PasswordHash::new(&hash).expect("Failed to parse hash");
+    match Argon2::default().verify_password(password.as_bytes(), &parsed_hash) {
+        Ok(_) => true,
+        Err(e) => {
+            println!("Password verification error: {}", e);
+            false
+        },
+    }
 }
