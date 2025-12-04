@@ -1,6 +1,6 @@
 /* DB tables */
 pub mod recipes;
-//// pub mod users;
+pub mod users;
 //pub mod ingredients;
 //pub mod tags;
 pub mod recipe_ingredients;

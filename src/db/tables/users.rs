@@ -1,6 +1,7 @@
 use sqlx::sqlite::SqliteQueryResult;
 
 
+#[derive(sqlx::FromRow, Debug, Clone)]
 pub struct UserDB {
     pub username : String,
     pub password_hash : String,
@@ -8,17 +9,27 @@ pub struct UserDB {
     pub created_at : i64,
 }
 
+//impl From<UserDB> for User {
+//    
+//}
+
 impl UserDB {
-    pub fn new(username: String, password_hash: String, email: String, created_at: i64) -> Self {
-        UserDB {
+    pub async fn authenticate(
+        db: &sqlx::SqlitePool,
+        username: &str,
+        password_hash: &str
+    ) -> Result<bool, sqlx::Error> {
+        let user = sqlx::query!(
+            "SELECT username FROM users WHERE username = ? AND password_hash = ?",
             username,
-            password_hash,
-            email,
-            created_at,
-        }
+            password_hash
+        )
+        .fetch_optional(db)
+        .await?;
+        Ok(user.is_some())
     }
 }
-
+/*
 pub async fn add_user(
     db: &sqlx::SqlitePool,
     user: &UserDB
@@ -99,3 +110,4 @@ pub async fn update_user(
         .await
 
 }
+*/
