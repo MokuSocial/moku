@@ -45,13 +45,13 @@ impl Query {
         if before.is_some() || last.is_some() {
             return Err(async_graphql::Error::new("Backward pagination is not supported, yet"));
         }
-        let recs = db.get_recipes(first.map(|e| e as i64), after).await.unwrap_or_default();
+        let recs = db.get_recipes(first, after).await.unwrap_or_default();
 
         let mut connection = Connection::new(false, false);
 
         connection.edges.extend(
-            recs.into_iter().enumerate().map(|(i, rec)| {
-                Edge::new(i as i64, rec)
+            recs.into_iter().map(|rec| {
+                Edge::new(rec.id, rec)
             })
         );
         Ok::<_,async_graphql::Error>(connection)

@@ -51,8 +51,8 @@ impl DatabaseHandler {
         Ok(ingredients)
     }
 
-    pub async fn get_recipes(self: &Self, first: Option<i64>, after: Option<i64>) -> Result<Vec<Recipe>, String> {
-        let recs_db = tables::recipes::RecipeDB::gets(&self.pool,first,after).await.map_err(|e| e.to_string())?;
+    pub async fn get_recipes(self: &Self, first: Option<usize>, after: Option<i64>) -> Result<Vec<Recipe>, String> {
+        let recs_db = tables::recipes::RecipeDB::gets(&self.pool,first.map(|e| e as i64),after).await.map_err(|e| e.to_string())?;
         let recipes: Vec<Recipe> = recs_db.into_iter().map(|r| Recipe::from(r)).collect();
         Ok(recipes)
     }
