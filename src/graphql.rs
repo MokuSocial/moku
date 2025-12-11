@@ -39,6 +39,7 @@ impl Query {
       //last: Option<i32>
       ) -> Result<Connection<i64, Recipe, EmptyFields, EmptyFields>> {
       let db = ctx.data::<DatabaseHandler>().unwrap();
+      let db_size = db.get_total_recipes();
       let before: Option<String> = None;
       let last: Option<i32> = None;
       query(after, before, first, last, |after, before, first, last| async move {
@@ -47,7 +48,13 @@ impl Query {
         }
         let recs = db.get_recipes(first, after).await.unwrap_or_default();
 
-        let mut connection = Connection::new(false, false);
+        let mut connection = if after.is_some() && first.is_some() {
+          let has_next_page = (first.unwrap() as i64 + after.unwrap()) < db_size;
+          let has_previous_page = after.unwrap() > 0;
+          Connection::new(has_previous_page, has_next_page)
+        } else {
+          Connection::new(false, false)
+        };
 
         connection.edges.extend(
             recs.into_iter().map(|rec| {
