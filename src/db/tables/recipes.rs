@@ -1,3 +1,5 @@
+//use anyhow::Ok;
+
 use crate::data_types::{Author, Indication, Recipe};
 
 
@@ -92,6 +94,16 @@ impl RecipeDB {
             .ok_or(sqlx::Error::RowNotFound);
 
         record
+    }
+
+    pub async fn count(db: &sqlx::SqlitePool) -> Result<i64, sqlx::Error> {
+        /*let record = */sqlx::query_scalar!(
+            r#"
+            SELECT COUNT(*) as count FROM recipes
+            "#
+        )
+        .fetch_one(db)
+        .await
     }
 
     pub async fn get(db: &sqlx::SqlitePool, id: i64) -> Result<RecipeDB, sqlx::Error> {

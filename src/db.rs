@@ -16,18 +16,33 @@ pub trait FromDB<T> {
 
 #[derive(Clone)]
 pub struct DatabaseHandler {
+    total_recipes: i64,
     pool: SqlitePool,
 }
 
 
 impl DatabaseHandler {
     pub async fn new() -> anyhow::Result<Self> {
+        let pool = handler::connect().await;
+        let total_recipes = tables::recipes::RecipeDB::count(&pool).await.unwrap_or(0);
+
         let ret = Self { 
-                    pool: handler::connect().await
+            total_recipes,
+            pool
         };
         handler::initialize(&ret.pool).await?;
         Ok(ret)
     }
+
+    pub fn get_total_recipes(self: &Self) -> i64 {
+        self.total_recipes
+    }
+
+    /*
+    pub async fn add_recipe(self: &mut Self, recipe: Recipe) -> Result<i64, String> {
+        (*self).total_recipes += 1;
+        Ok(recipe.id)
+    }*/
     
     pub async fn get_recipe(self: &Self, id: i64) -> Result<Recipe, String> {
         let rec_db = tables::recipes::RecipeDB::get(&self.pool, id).await.map_err(|e| e.to_string())?;
