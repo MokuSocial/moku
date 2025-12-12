@@ -16,19 +16,34 @@ pub trait FromDB<T> {
 
 #[derive(Clone)]
 pub struct DatabaseHandler {
+    total_recipes: i64,
     pool: SqlitePool,
 }
 
 
 impl DatabaseHandler {
     pub async fn new() -> anyhow::Result<Self> {
+
+        let pool = handler::connect().await;
+        let total_recipes = tables::recipes::RecipeDB::count(&pool).await.unwrap_or(0);
+
         let ret = Self { 
-                    pool: handler::connect().await
+            total_recipes,
+            pool
         };
         handler::initialize(&ret.pool).await?;
         Ok(ret)
     }
-    
+
+    pub fn get_total_recipes(self: &Self) -> i64 {
+        self.total_recipes
+    }
+
+    /*
+    pub async fn add_recipe(self: &mut Self, recipe: Recipe) -> Result<i64, String> {
+        (*self).total_recipes += 1;
+        Ok(recipe.id)
+    }*/
     pub async fn get_recipe(self: &Self, id: i64) -> Result<Recipe, String> {
         let rec_db = tables::recipes::RecipeDB::get(&self.pool, id).await.map_err(|e| e.to_string())?;
         Ok(Recipe::from(rec_db))
@@ -51,12 +66,12 @@ impl DatabaseHandler {
         Ok(ingredients)
     }
 
-    pub async fn get_recipes(self: &Self, first: Option<i64>, after: Option<i64>) -> Result<Vec<Recipe>, String> {
-        let recs_db = tables::recipes::RecipeDB::gets(&self.pool,first,after).await.map_err(|e| e.to_string())?;
+    pub async fn get_recipes(self: &Self, first: Option<usize>, after: Option<i64>) -> Result<Vec<Recipe>, String> {
+        let recs_db = tables::recipes::RecipeDB::gets(&self.pool,first.map(|e| e as i64),after).await.map_err(|e| e.to_string())?;
         let recipes: Vec<Recipe> = recs_db.into_iter().map(|r| Recipe::from(r)).collect();
         Ok(recipes)
     }
-
+  
     pub async fn user_password(self: &Self, username: &str) -> Result<String, String> {
         tables::users::UserDB::get_password_hash(&self.pool, username).await.map_err(|e| e.to_string())
     }

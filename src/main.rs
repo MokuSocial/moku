@@ -2,11 +2,12 @@ use axum::{routing::get, Router};
 use std::net::SocketAddr;
 use tokio;
 use tower_http::cors::{CorsLayer};
+use crate::db::DatabaseHandler;
 use async_graphql::{EmptySubscription, Schema};
 use async_graphql_axum::{GraphQL};
 
-use crate::db::DatabaseHandler;
 use crate::graphql::{Query,mutation::Mutation};
+
 
 //mod data_spot;
 mod graphql;
