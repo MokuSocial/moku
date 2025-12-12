@@ -47,13 +47,16 @@ impl Query {
         }
         let recs = db.get_recipes(first, after).await.unwrap_or_default();
 
-        let mut connection = if after.is_some() && first.is_some() {
-          let has_next_page = (first.unwrap() as i64 + after.unwrap()) < db_size;
-          let has_previous_page = after.unwrap() > 0;
-          Connection::new(has_previous_page, has_next_page)
-        } else {
-          Connection::new(false, false)
-        };
+        let mut has_next_page = false;
+        let mut has_previous_page = false;
+
+        if after.is_some() {
+          has_previous_page = after.unwrap() > 0;
+        } else if first.is_some() {
+          has_next_page = (first.unwrap() as i64 + after.unwrap_or(0)) < db_size;
+        }
+
+        let mut connection = Connection::new(has_previous_page, has_next_page);
 
         connection.edges.extend(
             recs.into_iter().map(|rec| {
