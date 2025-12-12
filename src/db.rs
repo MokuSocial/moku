@@ -23,6 +23,7 @@ pub struct DatabaseHandler {
 
 impl DatabaseHandler {
     pub async fn new() -> anyhow::Result<Self> {
+
         let pool = handler::connect().await;
         let total_recipes = tables::recipes::RecipeDB::count(&pool).await.unwrap_or(0);
 
@@ -43,7 +44,6 @@ impl DatabaseHandler {
         (*self).total_recipes += 1;
         Ok(recipe.id)
     }*/
-    
     pub async fn get_recipe(self: &Self, id: i64) -> Result<Recipe, String> {
         let rec_db = tables::recipes::RecipeDB::get(&self.pool, id).await.map_err(|e| e.to_string())?;
         Ok(Recipe::from(rec_db))
@@ -70,6 +70,10 @@ impl DatabaseHandler {
         let recs_db = tables::recipes::RecipeDB::gets(&self.pool,first.map(|e| e as i64),after).await.map_err(|e| e.to_string())?;
         let recipes: Vec<Recipe> = recs_db.into_iter().map(|r| Recipe::from(r)).collect();
         Ok(recipes)
+    }
+  
+    pub async fn user_password(self: &Self, username: &str) -> Result<String, String> {
+        tables::users::UserDB::get_password_hash(&self.pool, username).await.map_err(|e| e.to_string())
     }
 }
 /*pub async fn get_ingredient(db: &SqlitePool, id: i64) -> Result<Ingredient, String> {
