@@ -1,0 +1,85 @@
+name: CI/CD for dev branch
+
+on:
+  pull_request:
+    branches: [ dev ]
+  push:
+    branches: [ dev ]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Setup SQLite
+        uses: ryohidaka/action-setup-sqlite@v1.2.0
+      - name: Initialize Database
+        run: |
+          touch database.db
+          sqlite3 database.db ".read res/init.sql"
+      - name: Caching
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+      - run: cargo test --verbose
+
+  deploy:
+    name: Deploy to Server
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Caching
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+      - name: Setup SQLite
+        uses: ryohidaka/action-setup-sqlite@v1.2.0
+      - name: Initialize Database
+        run: |
+          touch database.db
+          sqlite3 database.db ".read res/init.sql"
+      - run: cargo build
+      - uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ vars.HOST_DEV }}
+          port: ${{ vars.PORT_DEV }}
+          username: ${{ secrets.USER_DEV }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo systemctl stop moku
+      - uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ vars.HOST_DEV }}
+          port: ${{ vars.PORT_DEV }}
+          username: ${{ secrets.USER_DEV }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: target/debug/moku
+          target: /usr/local/bin/
+          strip_components: 2
+          overwrite: true
+      - uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ vars.HOST_DEV }}
+          port: ${{ vars.PORT_DEV }}
+          username: ${{ secrets.USER_DEV }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo systemctl start moku
+
