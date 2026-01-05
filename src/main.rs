@@ -1,10 +1,12 @@
 use axum::{routing::get, Router};
-use std::net::SocketAddr;
+use std::net::{IpAddr, SocketAddr};
 use tokio;
 use tower_http::cors::{CorsLayer};
 use crate::db::DatabaseHandler;
 use async_graphql::{EmptySubscription, Schema};
 use async_graphql_axum::{GraphQL};
+use dotenv::dotenv;
+use std::env;
 
 use crate::graphql::{Query,mutation::Mutation};
 
@@ -17,6 +19,11 @@ mod auth;
 
 #[tokio::main]
 async fn main() {
+    // Carica le variabili d'ambiente dal file .env
+    dotenv().ok();
+
+    let _port = env::var("PORT").unwrap_or("8080".to_string());
+    let _host: IpAddr = env::var("HOST").unwrap_or("0.0.0.0".to_string()).parse().unwrap();
     // Inizializza il database
     let db = DatabaseHandler::new().await.expect("Failed to initialize database");
 
@@ -31,7 +38,7 @@ async fn main() {
         .layer(CorsLayer::permissive());
 
     // Imposta l'indirizzo del server
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let addr = SocketAddr::from((_host, _port.parse().unwrap()));
     println!("Server in esecuzione su http://{}", addr);
 
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
